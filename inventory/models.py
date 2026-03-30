@@ -10,33 +10,119 @@ class Account(models.Model):
     class Meta:
         db_table = 'inventory_account'
         verbose_name = "账户"
-        verbose_name_plural = "账户列表"
+        verbose_name_plural = "账户信息列表"
         
     def __str__(self):
+        return self.name
+
+
+class ProductCategory(models.Model):
+    """商品分类模型（支持无限级分类）"""
+    name = models.CharField(max_length=100, verbose_name="分类名称")
+    code = models.CharField(max_length=50, unique=True, verbose_name="分类编码")
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, verbose_name="父级分类")
+    level = models.IntegerField(default=1, verbose_name="层级")
+    sort_order = models.IntegerField(default=0, verbose_name="排序")
+    is_active = models.BooleanField(default=True, verbose_name="是否启用")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+    
+    class Meta:
+        db_table = 'inventory_product_category'
+        verbose_name = "商品分类"
+        verbose_name_plural = "商品分类列表"
+        ordering = ['level', 'sort_order', 'id']
+    
+    def __str__(self):
+        if self.parent:
+            return f"{self.parent} > {self.name}"
+        return self.name
+    
+    def get_full_code(self):
+        """获取完整编码（如：0001 > 00010001）"""
+        if self.parent:
+            return f"{self.parent.get_full_code()}{self.code}"
+        return self.code
+    
+    def get_full_name(self):
+        """获取完整名称"""
+        if self.parent:
+            return f"{self.parent.get_full_name()} > {self.name}"
         return self.name
 
 
 class Product(models.Model):
     """商品模型"""
+    code = models.CharField(max_length=50, unique=True, verbose_name="商品编号", blank=True, null=True)
+    brand = models.CharField(max_length=100, verbose_name="商品品牌", blank=True, default="")
     name = models.CharField(max_length=100, verbose_name="商品名称")
-    category = models.CharField(max_length=50, verbose_name="分类")
+    category = models.ForeignKey(
+        'ProductCategory', 
+        on_delete=models.SET_NULL,
+        null=True, 
+        blank=True, 
+        verbose_name="商品分类"
+    )
+    supplier = models.ForeignKey('Supplier', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="供应商")
+    unit = models.CharField(max_length=20, default="个", verbose_name="单位")
     stock = models.IntegerField(default=0, verbose_name="库存数量")
     cost_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="成本价")
     sell_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name="售价")
     account = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="关联账户")
+    remark = models.TextField(null=True, blank=True, verbose_name="备注")
+    is_active = models.BooleanField(default=True, verbose_name="是否启用")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="更新时间")
 
     class Meta:
         db_table = 'inventory_product'
         verbose_name = "商品"
-        verbose_name_plural = "商品列表"
+        verbose_name_plural = "商品信息"
         
     def __str__(self):
-        return self.name
+        return f"[{self.code}] {self.brand} {self.name}" if self.brand else f"[{self.code}] {self.name}"
+    
+    def save(self, *args, **kwargs):
+        # 如果没有商品编号，自动生成
+        if not self.code:
+            if self.category:
+                last_product = Product.objects.filter(category=self.category).order_by('-code').first()
+                if last_product and last_product.code:
+                    try:
+                        last_num = int(last_product.code[-4:])
+                        new_num = last_num + 1
+                        self.code = f"{self.category.get_full_code()}{new_num:04d}"
+                    except:
+                        self.code = f"{self.category.get_full_code()}0001"
+                else:
+                    self.code = f"{self.category.get_full_code()}0001"
+            else:
+                last_product = Product.objects.all().order_by('-id').first()
+                if last_product and last_product.code:
+                    try:
+                        last_num = int(last_product.code[-4:])
+                        new_num = last_num + 1
+                        self.code = f"0000{new_num:04d}"
+                    except:
+                        self.code = f"0000{Product.objects.count() + 1:04d}"
+                else:
+                    self.code = "00000001"
+        super().save(*args, **kwargs)
+    
+    def generate_code(self):
+        """自动生成商品编号"""
+        last_product = Product.objects.filter(category=self.category).order_by('-code').first()
+        if last_product and last_product.code:
+            try:
+                last_num = int(last_product.code[-4:])
+                new_num = last_num + 1
+                return f"{self.category.get_full_code()}{new_num:04d}"
+            except:
+                pass
+        return f"{self.category.get_full_code()}0001"
 
 
 class StockIn(models.Model):
-    """入库记录模型"""
+    """采购记录模型"""
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="商品")
     quantity = models.IntegerField(verbose_name="入库数量")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="进货单价")
@@ -46,8 +132,8 @@ class StockIn(models.Model):
     
     class Meta:
         db_table = 'inventory_stockin'
-        verbose_name = "入库记录"
-        verbose_name_plural = "入库记录列表"
+        verbose_name = "采购记录"
+        verbose_name_plural = "采购记录列表"
         
     def __str__(self):
         return f"{self.product.name} 入库 {self.quantity}"
@@ -71,26 +157,17 @@ class Expense(models.Model):
         return self.title
 
 
-class Customer(models.Model):
-    """客户模型"""
-    name = models.CharField(max_length=100, verbose_name="客户姓名")
-    phone = models.CharField(max_length=20, verbose_name="电话")
-    address = models.CharField(max_length=255, null=True, blank=True, verbose_name="地址")
-    note = models.TextField(null=True, blank=True, verbose_name="备注")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
-
-    class Meta:
-        db_table = 'inventory_customer'
-        verbose_name = "客户"
-        verbose_name_plural = "客户列表"
-        
-    def __str__(self):
-        return f"{self.name} ({self.phone})"
-
-
 class Sale(models.Model):
     """销售记录模型"""
-    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="客户")
+    # 客户字段关联到 Supplier，并限制只显示客户类型的来往单位
+    customer = models.ForeignKey(
+        'Supplier', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        verbose_name="客户",
+        limit_choices_to={'type': 'customer'}  # 只显示客户类型的来往单位
+    )
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="商品")
     quantity = models.IntegerField(verbose_name="销售数量")
     sell_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="销售单价")
@@ -103,6 +180,16 @@ class Sale(models.Model):
         db_table = 'inventory_sale'
         verbose_name = "销售记录"
         verbose_name_plural = "销售记录列表"
+        
+    def save(self, *args, **kwargs):
+        """保存时自动计算总金额和利润"""
+        self.total_price = self.quantity * self.sell_price
+        if self.product and self.product.cost_price:
+            cost_total = self.quantity * self.product.cost_price
+            self.profit = self.total_price - cost_total
+        else:
+            self.profit = 0
+        super().save(*args, **kwargs)
         
     def __str__(self):
         return f"{self.product.name} 销售 {self.quantity}"
@@ -139,7 +226,13 @@ class Repair(models.Model):
         ('done', '已完成'),
     )
 
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, verbose_name="客户")
+    # 客户字段关联到 Supplier，并限制只显示客户类型的来往单位
+    customer = models.ForeignKey(
+        'Supplier', 
+        on_delete=models.CASCADE, 
+        verbose_name="客户",
+        limit_choices_to={'type': 'customer'}  # 只显示客户类型的来往单位
+    )
     device_model = models.CharField(max_length=100, verbose_name="设备型号")
     issue = models.TextField(verbose_name="故障描述")
     cost = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="维修费用")
@@ -171,7 +264,8 @@ class RepairItem(models.Model):
 
     def __str__(self):
         return f"{self.repair.device_model} - {self.product.name} x{self.quantity}"
-    
+
+
 # ================== 基础资料模块 ==================
 
 class Supplier(models.Model):
@@ -306,8 +400,8 @@ class InitialAccounting(models.Model):
     class Meta:
         db_table = 'inventory_initial_accounting'
         verbose_name = "初期建账"
-        verbose_name_plural = "初期建账记录"
-        unique_together = ['account', 'initial_date']  # 每个账户每个日期只有一条期初记录
+        verbose_name_plural = "初期建立账户"
+        unique_together = ['account', 'initial_date']
 
     def __str__(self):
         return f"{self.account.name} - 期初余额: {self.initial_balance} (日期: {self.initial_date})"

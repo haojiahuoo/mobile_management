@@ -25,20 +25,21 @@ SECRET_KEY = 'django-insecure-a*ul($&$b3o*m82w6(n9d=(8e^8)jcjl3(8)u)3+id6^mh*mkn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['47.93.36.234', 'localhost', '127.0.0.1']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin', 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',   # 如果你用了 DRF
-    'inventory',        # ✅ 关键就是这一行
+    'rest_framework',   # 如果你用了 DRF  
+    'inventory.apps.InventoryConfig',  
 ]
 
 MIDDLEWARE = [
@@ -74,6 +75,7 @@ WSGI_APPLICATION = 'mobile_management.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# 使用 SQLite 进行本地开发
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -123,13 +125,92 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mobile_management_db',
-        'USER': 'django',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1',  # ⚠️ 不要用 localhost
-        'PORT': '3306',
-    }
+import os
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+# ================== Jazzmin 后台美化配置 ==================
+JAZZMIN_SETTINGS = {
+    "site_title": "手机维修管理系统",
+    "site_header": "手机维修管理",
+    "site_brand": "Mobile Management",
+    "welcome_sign": "欢迎使用手机维修管理系统",
+    "copyright": "Mobile Management System",
+    
+    "icons": {
+        "inventory.supplier": "fas fa-truck",             # 来往单位
+        "inventory.store": "fas fa-store",                # 门店信息
+        "inventory.staff": "fas fa-users",                # 职员信息
+        "inventory.incometype": "fas fa-money-bill-wave", # 收入类型
+        "inventory.expensetype": "fas fa-receipt",        # 费用类型
+        "inventory.initialaccounting": "fas fa-book",     # 初期建账
+        # 添加其他可能需要的图标
+        "inventory.product": "fas fa-mobile-alt",       # 商品信息
+        "inventory.sale": "fas fa-shopping-cart",       # 销售记录
+        "inventory.repair": "fas fa-wrench",            # 维修记录
+        "inventory.expense": "fas fa-money-bill",       # 支出记录
+        "inventory.transaction": "fas fa-exchange-alt", # 交易流水
+        "inventory.customer": "fas fa-user-friends",    # 客户信息
+        "inventory.stockin": "fas fa-arrow-down",       # 入库记录
+        "inventory.account": "fas fa-university",       # 银行账户
+        "auth.user": "fas fa-user",                     # 用户
+        "auth.Group": "fas fa-users",                   # 用户组
+    },
+    
+    "topmenu_links": [
+        {"name": "首页", "url": "admin:index"},
+        {"name": "📦 采购管理", "url": "/admin/inventory/product/"},
+        {"name": "💰 销售管理", "url": "/admin/inventory/sale/"},
+        {"name": "🔧 维修管理", "url": "/admin/inventory/repair/"},
+        {"name": "💳 财务管理", "url": "/admin/inventory/expense/"},
+        {"name": "📋 库存状态", "url": "/admin/inventory/status/"},
+        {"name": "📊 经营历程", "url": "/admin/inventory/transaction/"},
+    ],
+    
+    # ================== 添加隐藏功能 ==================
+    # 隐藏不想要在侧边栏显示的模型
+    "hide_models": [
+        "inventory.sale",             # 销售记录
+        "inventory.repair",           # 维修记录
+        "inventory.expense",          # 支出记录
+        "inventory.transaction",      # 交易流水
+        "auth",                       # 用户管理
+        "inventory.stockin",          # 入库记录
+        "inventory.customer",         # 客户信息
+        "inventory.repairItem",       # 维修项目
+    ],
+    
+    # 隐藏整个应用（不推荐，会隐藏所有）
+    "hide_apps": [
+        # "auth",  # 隐藏用户认证应用
+    ],
+    
+    # 控制侧边栏显示顺序
+    "order_with_respect_to": [
+        "inventory.product",          # 商品信息
+        "inventory.productcategory",  # 商品分类
+        "inventory.supplier",         # 来往单位
+        "inventory.store",            # 门店信息
+        "inventory.staff",            # 职员信息
+        "inventory.incometype",       # 收入类型
+        "inventory.expensetype",      # 费用类型
+        "inventory.account",          # 银行账户
+        "inventory.initialaccounting",# 初期建账
+    ],
+    "custom_css": "admin/css/table_list.css",  # 统一的表格样式
+    "topmenu_sticky": True,
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "theme": "darkly",
+}
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,  # 不缩小文字
+    "brand_small_text": False,   # 品牌文字不缩小
+    "navbar": "navbar-sticky",  # 使用固定类名
+    "navbar_fixed": True,  # 关键配置，固定导航栏
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    # ... 其他已有配置保持不变 ...
 }

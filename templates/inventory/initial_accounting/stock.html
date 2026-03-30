@@ -1,0 +1,275 @@
+<!-- templates/admin/initial_stock.html -->
+{% extends "admin/base_site.html" %}
+
+{% block title %}初期库存商品{% endblock %}
+
+{% block content %}
+<style>
+    /* 页面样式 */
+    .stock-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .stock-table th {
+        background: #f8f9fa;
+        padding: 12px 10px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 13px;
+        border-bottom: 2px solid #dee2e6;
+    }
+    
+    .stock-table td {
+        padding: 10px;
+        text-align: center;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .stock-table input {
+        width: 100px;
+        padding: 6px 8px;
+        text-align: right;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 13px;
+    }
+    
+    .stock-table input:focus {
+        outline: none;
+        border-color: #3498db;
+    }
+    
+    .btn-primary {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    
+    .btn-success {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+        text-decoration: none;
+        padding: 10px 30px;
+        border-radius: 5px;
+        margin-left: 10px;
+        font-size: 16px;
+        display: inline-block;
+    }
+    
+    .btn-add {
+        background: #17a2b8;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+    
+    .btn-add:hover, .btn-primary:hover, .btn-success:hover {
+        opacity: 0.9;
+    }
+    
+    .search-box {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    
+    .search-box input {
+        padding: 8px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        width: 250px;
+    }
+    
+    h1 {
+        font-size: 20px;
+        margin-bottom: 10px;
+        color: #2c3e50;
+    }
+    
+    .sub-title {
+        color: #666;
+        margin-bottom: 20px;
+        font-size: 13px;
+    }
+</style>
+
+<div style="padding: 20px;">
+    <h1>📦 初期库存商品</h1>
+    <p class="sub-title">设置商品期初库存数量和成本均价</p>
+    
+    <!-- 工具栏 -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="🔍 搜索商品编号/名称..." onkeyup="searchProduct()">
+            <button type="button" class="btn-primary" onclick="window.location.href='/admin/inventory/product/add/'">➕ 添加新商品</button>
+        </div>
+    </div>
+    
+    <form method="post" id="stockForm">
+        {% csrf_token %}
+        
+        <table class="stock-table" id="productTable">
+            <thead>
+                <tr>
+                    <th style="width: 80px;">商品编号</th>
+                    <th style="width: 180px;">商品名称</th>
+                    <th style="width: 100px;">初期数量</th>
+                    <th style="width: 100px;">辅助数量</th>
+                    <th style="width: 120px;">成本均价</th>
+                    <th style="width: 120px;">库存金额</th>
+                </tr>
+            </thead>
+            <tbody id="productList">
+                {% for product in products %}
+                <tr class="product-row" data-name="{{ product.name }}" data-code="{{ product.id }}">
+                    <td style="text-align: center;">
+                        {{ product.id }}
+                        <input type="hidden" name="product_{{ product.id }}" value="{{ product.id }}">
+                    </td>
+                    <td style="text-align: left;">{{ product.name }}</td>
+                    <td style="text-align: right;">
+                        <input type="number" name="stock_{{ product.id }}" value="{{ product.stock|default:0 }}" step="1" class="stock-input" data-id="{{ product.id }}" style="width: 90px;">
+                    </td>
+                    <td style="text-align: right;">
+                        <input type="number" name="assist_{{ product.id }}" value="0" step="1" style="width: 90px;">
+                    </td>
+                    <td style="text-align: right;">
+                        <input type="number" name="cost_{{ product.id }}" value="{{ product.cost_price|default:0 }}" step="0.01" class="cost-input" data-id="{{ product.id }}" style="width: 100px;">
+                    </td>
+                    <td style="text-align: right;" id="value_{{ product.id }}" class="total-value">
+                        ¥{{ product.stock|default:0|floatformat:2 }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="padding: 40px; text-align: center;">
+                        📭 暂无商品，请点击上方"添加新商品"按钮
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- 底部统计 -->
+        <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <span style="font-weight: bold;">📊 统计信息：</span>
+                <span id="totalCount" style="margin-left: 15px;">商品总数: {{ products|length }}</span>
+                <span id="totalStock" style="margin-left: 15px;">总库存数量: 0</span>
+                <span id="totalValue" style="margin-left: 15px;">库存总金额: ¥0</span>
+            </div>
+            <div>
+                <!-- 【保存按钮】 -->
+                <button type="submit" class="btn-success">💾 保存设置</button>
+                <!-- 【返回按钮】 -->
+                <a href="{% url 'admin:initial_accounting_choice' %}" class="btn-secondary">🔙 返回</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    // 【功能1】实时计算总价值（初期数量 × 成本均价）
+    function updateValue(productId) {
+        const stockInput = document.querySelector(`input[name="stock_${productId}"]`);
+        const costInput = document.querySelector(`input[name="cost_${productId}"]`);
+        if (stockInput && costInput) {
+            const stock = parseFloat(stockInput.value) || 0;
+            const cost = parseFloat(costInput.value) || 0;
+            const value = (stock * cost).toFixed(2);
+            const valueSpan = document.getElementById(`value_${productId}`);
+            if (valueSpan) {
+                valueSpan.innerText = '¥' + value;
+            }
+        }
+        // 更新底部统计
+        updateStatistics();
+    }
+    
+    // 【功能2】更新底部统计信息
+    function updateStatistics() {
+        let totalStockCount = 0;
+        let totalValueSum = 0;
+        
+        document.querySelectorAll('.product-row').forEach(row => {
+            const stockInput = row.querySelector('input[name^="stock_"]');
+            const valueSpan = row.querySelector('.total-value');
+            
+            if (stockInput) {
+                const stock = parseFloat(stockInput.value) || 0;
+                totalStockCount += stock;
+            }
+            if (valueSpan) {
+                const valueText = valueSpan.innerText.replace('¥', '');
+                const value = parseFloat(valueText) || 0;
+                totalValueSum += value;
+            }
+        });
+        
+        document.getElementById('totalStock').innerHTML = `总库存数量: ${totalStockCount.toFixed(0)}`;
+        document.getElementById('totalValue').innerHTML = `库存总金额: ¥${totalValueSum.toFixed(2)}`;
+    }
+    
+    // 【功能3】搜索商品
+    function searchProduct() {
+        const searchValue = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('.product-row');
+        
+        rows.forEach(row => {
+            const name = row.getAttribute('data-name') || '';
+            const code = row.getAttribute('data-code') || '';
+            if (name.toLowerCase().includes(searchValue) || code.includes(searchValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    // 【绑定事件】当输入框内容变化时，实时更新总价值
+    document.addEventListener('DOMContentLoaded', function() {
+        // 绑定库存输入框
+        document.querySelectorAll('.stock-input').forEach(input => {
+            input.addEventListener('input', function() {
+                const productId = this.getAttribute('data-id');
+                updateValue(productId);
+            });
+        });
+        
+        // 绑定成本输入框
+        document.querySelectorAll('.cost-input').forEach(input => {
+            input.addEventListener('input', function() {
+                const productId = this.getAttribute('data-id');
+                updateValue(productId);
+            });
+        });
+        
+        // 初始化统计
+        updateStatistics();
+    });
+</script>
+{% endblock %}

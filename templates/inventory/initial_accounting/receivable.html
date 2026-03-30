@@ -1,0 +1,61 @@
+<!-- templates/admin/initial_receivable.html -->
+{% extends "admin/base_site.html" %}
+
+{% block title %}初期应收应付{% endblock %}
+
+{% block content %}
+<div style="padding: 20px;">
+    <h1>💰 初期应收应付</h1>
+    <p style="color: #666; margin-bottom: 20px;">设置客户应收款、供应商应付款</p>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <!-- 应收款（客户） -->
+        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h2 style="color: #28a745;">📋 应收款（客户）</h2>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="type" value="receivable">
+                <table style="width: 100%; margin-top: 15px;">
+                    {% for customer in customers %}
+                    <tr>
+                        <td style="padding: 8px;">{{ customer.name }}</td>
+                        <td style="padding: 8px;">
+                            <input type="number" name="amount_{{ customer.id }}" value="0" step="0.01" style="width: 150px; padding: 5px;">
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="2" style="padding: 20px; text-align: center;">暂无客户数据</td></tr>
+                    {% endfor %}
+                </table>
+                <button type="submit" style="margin-top: 15px; background: #28a745; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer;">保存应收款</button>
+            </form>
+        </div>
+        
+        <!-- 应付款（供应商） -->
+        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h2 style="color: #dc3545;">📋 应付款（供应商）</h2>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="type" value="payable">
+                <table style="width: 100%; margin-top: 15px;">
+                    {% for supplier in suppliers %}
+                    <tr>
+                        <td style="padding: 8px;">{{ supplier.name }}</td>
+                        <td style="padding: 8px;">
+                            <input type="number" name="amount_{{ supplier.id }}" value="0" step="0.01" style="width: 150px; padding: 5px;">
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="2" style="padding: 20px; text-align: center;">暂无供应商数据</td></tr>
+                    {% endfor %}
+                </table>
+                <button type="submit" style="margin-top: 15px; background: #dc3545; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer;">保存应付款</button>
+            </form>
+        </div>
+    </div>
+    
+    <div style="margin-top: 20px; text-align: center;">
+    <a href="{% url 'admin:initial_accounting_choice' %}" style="background: #6c757d; color: white; text-decoration: none; padding: 10px 30px; border-radius: 5px;">返回</a>
+</div>
+</div>
+{% endblock %}

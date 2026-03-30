@@ -1,0 +1,50 @@
+<!-- templates/admin/initial_finance.html -->
+{% extends "admin/base_site.html" %}
+
+{% block title %}初期财务数据{% endblock %}
+
+{% block content %}
+<div style="padding: 20px;">
+    <h1>📈 初期财务数据</h1>
+    <p style="color: #666; margin-bottom: 20px;">设置期初利润、期初成本等财务数据</p>
+    
+    <form method="post" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        {% csrf_token %}
+        <table style="width: 100%;">
+            <tr>
+                <td style="padding: 15px; width: 200px;"><strong>期初利润</strong></td>
+                <td style="padding: 15px;">
+                    <input type="number" name="initial_profit" value="{{ initial_profit|default:0 }}" step="0.01" style="width: 250px; padding: 8px;">
+                </td>
+                <td style="color: #666;">初始化时的累计利润</td>
+            </tr>
+            <tr>
+                <td style="padding: 15px;"><strong>期初成本</strong></td>
+                <td style="padding: 15px;">
+                    <input type="number" name="initial_cost" value="{{ initial_cost|default:0 }}" step="0.01" style="width: 250px; padding: 8px;">
+                </td>
+                <td style="color: #666;">初始化时的累计成本</td>
+            </tr>
+            <tr>
+                <td style="padding: 15px;"><strong>期初收入</strong></td>
+                <td style="padding: 15px;">
+                    <input type="number" name="initial_income" value="{{ initial_income|default:0 }}" step="0.01" style="width: 250px; padding: 8px;">
+                </td>
+                <td style="color: #666;">初始化时的累计收入</td>
+            </tr>
+            <tr>
+                <td style="padding: 15px;"><strong>期初支出</strong></td>
+                <td style="padding: 15px;">
+                    <input type="number" name="initial_expense" value="{{ initial_expense|default:0 }}" step="0.01" style="width: 250px; padding: 8px;">
+                </td>
+                <td style="color: #666;">初始化时的累计支出</td>
+            </tr>
+        </table>
+        
+        <div style="margin-top: 20px; text-align: right;">
+    <button type="submit" style="background: #28a745; color: white; border: none; padding: 10px 30px; border-radius: 5px; cursor: pointer;">保存设置</button>
+    <a href="{% url 'admin:initial_accounting_choice' %}" style="background: #6c757d; color: white; text-decoration: none; padding: 10px 30px; border-radius: 5px; margin-left: 10px;">返回</a>
+</div>
+    </form>
+</div>
+{% endblock %}
