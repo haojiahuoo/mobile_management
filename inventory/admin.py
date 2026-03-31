@@ -1,391 +1,280 @@
 # inventory/admin.py
+
 from django.contrib import admin
-from django.db.models import Sum
+from django.utils.html import format_html
 from django.utils.timezone import now
-import json
-from datetime import timedelta
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.urls import path
-from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import Sum
+from datetime import timedelta
+from itertools import product
+import json
+import uuid
 
 from .models import (
     Account, Product, StockIn, Expense, Sale,
-    Transaction, Repair, RepairItem, 
-    Supplier, Store, Staff, IncomeType, ExpenseType, InitialAccounting, ProductCategory
+    Transaction, Repair, RepairItem,
+    Supplier, Store, Staff,
+    IncomeType, ExpenseType,
+    InitialAccounting, ProductCategory,
+    ProductSKU, ProductAttribute, ProductAttributeValue
 )
-
-# 导入 views 模块
 from . import views
 
 
-# ================== 基础资料管理 ==================
+# ================== 通用 UI 函数 ==================
+def fmt_money(v):
+    if v is None:
+        return '-'
+    try:
+        return format_html('¥{:.2f}', float(v))
+    except:
+        return '-'
 
-class SupplierAdmin(admin.ModelAdmin):
-    """来往单位管理"""
-    list_display = ('id', 'name', 'type', 'contact_person', 'phone', 'created_at')
-    list_display_links = ('name',)
-    list_filter = ('type', 'created_at')
-    search_fields = ('name', 'contact_person', 'phone')
-    list_per_page = 25
-    readonly_fields = ('created_at', 'updated_at')
-    
-    fieldsets = (
-        ('单位信息', {
-            'fields': (
-                ('name', 'type'),
-                ('contact_person', 'phone'),
-                ('address',),
-            ),
-            'classes': ('wide',),
-        }),
-        ('财务信息', {
-            'fields': (
-                ('bank_name', 'bank_account'),
-                ('tax_number',),
-            ),
-            'classes': ('wide',),
-        }),
-        ('其他信息', {
-            'fields': ('remark',),
-            'classes': ('collapse',),
-        }),
+
+def fmt_status(v):
+    return format_html(
+        '<span class="status-badge {}">{}</span>',
+        'status-active' if v else 'status-inactive',
+        '启用' if v else '禁用'
     )
 
 
-class StoreAdmin(admin.ModelAdmin):
-    """门店信息管理"""
-    list_display = ('code', 'name', 'manager', 'phone', 'is_active', 'created_at')
-    list_display_links = ('name',)
-    list_filter = ('is_active', 'created_at')
-    search_fields = ('name', 'code', 'manager')
+def fmt_stock(v):
+    if v <= 0:
+        return format_html('<span class="stock-out">⚠️ 缺货 ({})</span>', v)
+    elif v < 10:
+        return format_html('<span class="stock-low">⚠️ 低库存 ({})</span>', v)
+    return format_html('<span class="stock-ok">✓ {}</span>', v)
+
+
+# ================== BaseAdmin ==================
+class BaseAdmin(admin.ModelAdmin):
     list_per_page = 25
-    readonly_fields = ('created_at',)
-    
-    fieldsets = (
-        ('门店信息', {
-            'fields': (
-                ('code', 'name'),
-                ('manager', 'phone'),
-                ('address',),
-                ('business_hours',),
-            ),
-            'classes': ('wide',),
-        }),
-        ('状态', {
-            'fields': ('is_active', 'remark'),
-            'classes': ('wide',),
-        }),
-    )
+
+    def status_display(self, obj):
+        if hasattr(obj, 'is_active'):
+            return fmt_status(obj.is_active)
+        return '-'
+    status_display.short_description = '状态'
 
 
-class StaffAdmin(admin.ModelAdmin):
-    """职员信息管理"""
-    list_display = ('code', 'name', 'position', 'phone', 'store', 'is_active', 'hire_date')
-    list_display_links = ('name',)
-    list_filter = ('position', 'store', 'is_active', 'hire_date')
-    search_fields = ('name', 'code', 'phone')
-    list_per_page = 25
-    readonly_fields = ('created_at',)
-    
-    fieldsets = (
-        ('基本信息', {
-            'fields': (
-                ('code', 'name'),
-                ('position', 'phone'),
-                ('id_card', 'hire_date'),
-            ),
-            'classes': ('wide',),
-        }),
-        ('薪资信息', {
-            'fields': (
-                ('salary', 'commission_rate'),
-                ('store',),
-            ),
-            'classes': ('wide',),
-        }),
-        ('其他信息', {
-            'fields': ('remark', 'is_active'),
-            'classes': ('collapse',),
-        }),
-    )
+# ================== 基础资料 ==================
+class SupplierAdmin(BaseAdmin):
+    list_display = ('name', 'type_display', 'contact_person', 'phone', 'created_at')
+
+    def type_display(self, obj):
+        return {'supplier': '供应商', 'customer': '客户', 'both': '供应商/客户'}.get(obj.type, obj.type)
+    type_display.short_description = '类型'
 
 
-class IncomeTypeAdmin(admin.ModelAdmin):
-    """收入类型管理"""
-    list_display = ('code', 'name', 'parent', 'sort_order', 'is_active')
-    list_filter = ('is_active', 'parent')
-    search_fields = ('name', 'code')
-    list_per_page = 25
-    ordering = ('sort_order',)
+class StoreAdmin(BaseAdmin):
+    list_display = ('code', 'name', 'manager', 'phone', 'status_display')
 
 
-class ExpenseTypeAdmin(admin.ModelAdmin):
-    """费用类型管理"""
-    list_display = ('code', 'name', 'parent', 'sort_order', 'is_active')
-    list_filter = ('is_active', 'parent')
-    search_fields = ('name', 'code')
-    list_per_page = 25
-    ordering = ('sort_order',)
+class StaffAdmin(BaseAdmin):
+    list_display = ('code', 'name', 'position_display', 'store', 'status_display')
+
+    def position_display(self, obj):
+        return {
+            'manager': '经理',
+            'cashier': '收银员',
+            'salesman': '销售员',
+            'technician': '技术员'
+        }.get(obj.position, obj.position)
+    position_display.short_description = '职位'
+
+
+class ProductCategoryAdmin(BaseAdmin):
+    list_display = ('name', 'parent', 'level', 'add_product')
+
+    def add_product(self, obj):
+        if obj.children.exists():
+            return "-"
+        return format_html(
+            '<a class="button" href="/admin/inventory/product/add/?category={}">➕ 添加商品</a>',
+            obj.id
+        )
+    add_product.short_description = '操作'
 
 
 # ================== 商品管理 ==================
-
-class ProductCategoryAdmin(admin.ModelAdmin):
-    """商品分类管理"""
-    list_display = ('code', 'name', 'level', 'parent', 'sort_order', 'is_active')
-    list_filter = ('level', 'is_active')
-    search_fields = ('name', 'code')
-    list_per_page = 25
-    
-    def changelist_view(self, request, extra_context=None):
-        return redirect('admin:category_list')
-    
-    def add_view(self, request, form_url='', extra_context=None):
-        return redirect('admin:category_add')
+# SKU Inline
+class ProductSKUInline(admin.TabularInline):
+    model = ProductSKU
+    extra = 0
 
 
+@admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    """商品信息管理"""
-    list_display = ('code', 'brand', 'name', 'category', 'supplier', 'unit', 'stock', 'cost_price', 'sell_price', 'is_active')
-    list_display_links = ('code', 'name')
-    list_filter = ('category', 'supplier', 'is_active', 'brand')
-    search_fields = ('code', 'name', 'brand')
-    list_editable = ('stock', 'sell_price', 'is_active')
-    list_per_page = 25
-    list_select_related = ('category', 'supplier')
-    
-    fieldsets = (
-        ('📦 商品信息', {
-            'fields': (
-                ('code', 'brand', 'name'),
-                ('category', 'supplier', 'unit'),
-                ('stock', 'cost_price', 'sell_price'),
-                ('account', 'is_active'),
-            ),
-            'classes': ('wide',),
-        }),
-        ('📝 备注信息', {
-            'fields': ('remark',),
-            'classes': ('collapse',),
-        }),
-    )
+    inlines = [ProductSKUInline]
+    list_display = ('code', 'brand', 'name', 'category', 'stock', 'sell_price', 'generate_sku_btn')
+    search_fields = ('name', 'brand', 'code')
+    list_filter = ('category', 'brand')
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('<int:product_id>/generate_sku/', self.admin_site.admin_view(self.generate_sku_view))
+        ]
+        return custom_urls + urls
+
+    def generate_sku_btn(self, obj):
+        return format_html(
+            '<a class="button" href="{}">生成SKU</a>',
+            f"/admin/inventory/product/{obj.id}/generate_sku/"
+        )
+    generate_sku_btn.short_description = '生成SKU'
+
+    def generate_sku_view(self, request, product_id):
+        product = Product.objects.get(id=product_id)
+        # 示例属性字典（可扩展为动态 UI）
+        attributes = {"颜色": ["黑色", "白色"], "容量": ["128G", "256G"]}
+        # 删除原 SKU
+        ProductSKU.objects.filter(product=product).delete()
+        skus = generate_sku(product, attributes)
+        ProductSKU.objects.bulk_create(skus)
+        return redirect(f"/admin/inventory/product/{product_id}/change/")
+
+    # 自动带分类
+    def get_changeform_initial_data(self, request):
+        initial = super().get_changeform_initial_data(request)
+        category_id = request.GET.get('category')
+        if category_id:
+            initial['category'] = category_id
+        return initial
 
 
-class StockInAdmin(admin.ModelAdmin):
-    """入库记录管理"""
-    list_display = ('id', 'product_code', 'product_name', 'quantity', 'price', 'total_cost', 'supplier', 'account', 'created_at')
-    list_display_links = ('id',)
-    list_filter = ('supplier', 'account', 'created_at')
-    search_fields = ('product__name', 'product__code', 'supplier')
-    list_per_page = 25
-    readonly_fields = ('created_at',)
-    
-    def product_code(self, obj):
-        return obj.product.code if obj.product else '-'
-    product_code.short_description = '商品编号'
-    
-    def product_name(self, obj):
-        return obj.product.name if obj.product else '-'
-    product_name.short_description = '商品名称'
-    
+@admin.register(ProductAttribute)
+class ProductAttributeAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+
+
+@admin.register(ProductAttributeValue)
+class ProductAttributeValueAdmin(admin.ModelAdmin):
+    list_display = ('attribute', 'value')
+
+
+# ================== SKU 生成函数 ==================
+def generate_sku(product, attributes_dict):
+    keys = list(attributes_dict.keys())
+    values = list(attributes_dict.values())
+    all_combinations = list(product(*values))
+    skus = []
+    for combo in all_combinations:
+        attr_combo = dict(zip(keys, combo))
+        skus.append(ProductSKU(
+            product=product,
+            attributes=attr_combo,
+            code=str(uuid.uuid4())[:8]
+        ))
+    return skus
+
+
+# ================== 入库 ==================
+class StockInAdmin(BaseAdmin):
+    list_display = ('product', 'quantity', 'price_display', 'total_cost', 'created_at')
+
+    def price_display(self, obj):
+        return fmt_money(obj.price)
+
     def total_cost(self, obj):
-        return obj.quantity * obj.price
-    total_cost.short_description = '总成本'
+        return fmt_money(obj.quantity * obj.price)
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            p = obj.product
+            old_stock = p.stock
+            new_stock = old_stock + obj.quantity
+            if new_stock > 0:
+                p.cost_price = (old_stock * p.cost_price + obj.quantity * obj.price) / new_stock
+            p.stock = new_stock
+            p.save()
+        super().save_model(request, obj, form, change)
 
 
-# ================== 销售管理 ==================
+# ================== 销售 ==================
+class SaleAdmin(BaseAdmin):
+    list_display = ('product', 'quantity', 'sell_price_display', 'total_price_display', 'profit_display')
 
-class SaleAdmin(admin.ModelAdmin):
-    """销售记录管理"""
-    list_display = ('id', 'product_code', 'product_name', 'customer_name', 'quantity', 'sell_price', 'total_price', 'profit', 'created_at')
-    list_display_links = ('id',)
-    list_filter = ('created_at', 'account')
-    search_fields = ('product__name', 'product__code', 'customer__name')
-    list_per_page = 25
-    readonly_fields = ('total_price', 'profit', 'created_at')
-    
-    def product_code(self, obj):
-        return obj.product.code if obj.product else '-'
-    product_code.short_description = '商品编号'
-    
-    def product_name(self, obj):
-        return obj.product.name if obj.product else '-'
-    product_name.short_description = '商品名称'
-    
-    def customer_name(self, obj):
-        return obj.customer.name if obj.customer else '-'
-    customer_name.short_description = '客户名称'
-    
-    fieldsets = (
-        ('💰 销售信息', {
-            'fields': (
-                ('product', 'customer'),
-                ('quantity', 'sell_price'),
-                ('total_price', 'profit'),
-                ('account', 'created_at'),
-            ),
-            'classes': ('wide',),
-        }),
-    )
+    def sell_price_display(self, obj):
+        return fmt_money(obj.sell_price)
+
+    def total_price_display(self, obj):
+        return fmt_money(obj.total_price)
+
+    def profit_display(self, obj):
+        return fmt_money(obj.profit)
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            p = obj.product
+            obj.total_price = obj.quantity * obj.sell_price
+            obj.profit = (obj.sell_price - p.cost_price) * obj.quantity
+            p.stock -= obj.quantity
+            p.save()
+        super().save_model(request, obj, form, change)
 
 
-# ================== 维修管理 ==================
+# ================== 维修 ==================
+class RepairAdmin(BaseAdmin):
+    list_display = ('id', 'device_model', 'cost_display', 'status_display')
 
-class RepairAdmin(admin.ModelAdmin):
-    """维修记录管理"""
-    list_display = ('id', 'customer_name', 'device_model', 'cost', 'status', 'created_at')
-    list_display_links = ('id',)
-    list_filter = ('status', 'created_at')
-    search_fields = ('device_model', 'customer__name')
-    list_per_page = 25
-    readonly_fields = ('created_at',)
-    
-    def customer_name(self, obj):
-        return obj.customer.name if obj.customer else '-'
-    customer_name.short_description = '客户名称'
-    
-    fieldsets = (
-        ('🔧 维修信息', {
-            'fields': (
-                ('customer', 'device_model'),
-                ('issue',),
-                ('cost', 'status'),
-                ('account', 'remark'),
-            ),
-            'classes': ('wide',),
-        }),
-    )
+    def cost_display(self, obj):
+        return fmt_money(obj.cost)
 
 
-class RepairItemAdmin(admin.ModelAdmin):
-    """维修用料管理"""
-    list_display = ('id', 'repair_id', 'product_name', 'quantity', 'created_at')
-    list_display_links = ('id',)
-    list_filter = ('repair__status', 'created_at')
-    search_fields = ('product__name', 'repair__device_model')
-    list_per_page = 25
-    readonly_fields = ('created_at',)
-    
-    def repair_id(self, obj):
-        return obj.repair.id
-    repair_id.short_description = '维修单号'
-    
-    def product_name(self, obj):
-        return obj.product.name if obj.product else '-'
-    product_name.short_description = '用料名称'
+class RepairItemAdmin(BaseAdmin):
+    list_display = ('repair', 'product', 'quantity')
 
 
-# ================== 财务管理 ==================
+# ================== 财务 ==================
+class AccountAdmin(BaseAdmin):
+    list_display = ('name', 'balance_display')
 
-class AccountAdmin(admin.ModelAdmin):
-    """银行账户管理"""
-    list_display = ('name', 'balance', 'created_at')
-    list_display_links = ('name',)
-    list_filter = ('created_at',)
-    search_fields = ('name',)
-    list_per_page = 25
-    readonly_fields = ('created_at',)
-    
-    fieldsets = (
-        ('🏦 账户信息', {
-            'fields': (
-                ('name', 'balance'),
-            ),
-            'classes': ('wide',),
-        }),
-    )
+    def balance_display(self, obj):
+        return fmt_money(obj.balance)
 
 
-class ExpenseAdmin(admin.ModelAdmin):
-    """支出记录管理"""
-    list_display = ('title', 'amount', 'category', 'account', 'created_at')
-    list_display_links = ('title',)
-    list_filter = ('category', 'account', 'created_at')
-    search_fields = ('title', 'remark')
-    list_per_page = 25
-    readonly_fields = ('created_at',)
-    
-    fieldsets = (
-        ('💸 支出信息', {
-            'fields': (
-                ('title', 'amount'),
-                ('category', 'account'),
-                ('remark',),
-            ),
-            'classes': ('wide',),
-        }),
-    )
+class ExpenseAdmin(BaseAdmin):
+    list_display = ('title', 'amount_display', 'account', 'created_at')
+
+    def amount_display(self, obj):
+        return fmt_money(obj.amount)
 
 
-class TransactionAdmin(admin.ModelAdmin):
-    """交易流水管理"""
-    list_display = ('account', 'type', 'amount', 'description', 'created_at')
-    list_display_links = ('account',)
-    list_filter = ('type', 'account', 'created_at')
-    search_fields = ('description', 'account__name')
-    list_per_page = 25
-    readonly_fields = ('created_at',)
-    
-    fieldsets = (
-        ('📊 交易信息', {
-            'fields': (
-                ('account', 'type'),
-                ('amount', 'description'),
-            ),
-            'classes': ('wide',),
-        }),
-    )
+class TransactionAdmin(BaseAdmin):
+    list_display = ('account', 'type_display', 'amount_display', 'created_at')
+
+    def type_display(self, obj):
+        return '收入' if obj.type == 'income' else '支出'
+
+    def amount_display(self, obj):
+        return fmt_money(obj.amount)
 
 
-# ================== 初期建账 ==================
+class IncomeTypeAdmin(BaseAdmin):
+    list_display = ('name', 'parent', 'status_display')
 
-class InitialAccountingAdmin(admin.ModelAdmin):
-    """初期建账管理"""
-    list_display = ('account', 'initial_balance', 'initial_date', 'created_at')
-    list_filter = ('initial_date', 'account')
-    search_fields = ('account__name',)
-    list_per_page = 25
-    readonly_fields = ('created_at', 'updated_at')
-    
+
+class ExpenseTypeAdmin(BaseAdmin):
+    list_display = ('name', 'parent', 'status_display')
+
+
+class InitialAccountingAdmin(BaseAdmin):
+    list_display = ('account', 'initial_balance', 'initial_date')
+
     def changelist_view(self, request, extra_context=None):
         return redirect('admin:initial_accounting_choice')
 
 
-# ================== 自定义后台站点 ==================
-
+# ================== 自定义 AdminSite ==================
 class MyAdminSite(admin.AdminSite):
     site_header = "手机维修管理系统"
     site_title = "管理后台"
     index_title = "数据总览"
     index_template = 'admin/index.html'
 
-    # 初期建账页面包装
-    def initial_accounting_choice(self, request):
-        return views.initial_accounting_choice(request)
-    
-    def initial_stock(self, request):
-        return views.initial_stock(request)
-    
-    def initial_receivable(self, request):
-        return views.initial_receivable(request)
-    
-    def initial_cash(self, request):
-        return views.initial_cash(request)
-    
-    def initial_finance(self, request):
-        return views.initial_finance(request)
-    
-    # 商品分类页面包装
-    def category_list(self, request, category_id=None):
-        return views.category_list(request, category_id)
-    
-    def category_add(self, request, parent_id=None):
-        return views.category_add(request, parent_id)
-    
-    # 库存状态页面包装
-    def inventory_status(self, request):
-        return views.inventory_status(request)
-    
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
@@ -404,55 +293,21 @@ class MyAdminSite(admin.AdminSite):
 
     def index(self, request, extra_context=None):
         today = now().date()
-
-        today_sales = Sale.objects.filter(created_at__date=today).aggregate(
-            total=Sum('total_price')
-        )['total'] or 0
-
-        today_profit = Sale.objects.filter(created_at__date=today).aggregate(
-            total=Sum('profit')
-        )['total'] or 0
-
-        today_expense = Expense.objects.filter(created_at__date=today).aggregate(
-            total=Sum('amount')
-        )['total'] or 0
+        today_sales = Sale.objects.filter(created_at__date=today).aggregate(total=Sum('total_price'))['total'] or 0
+        today_profit = Sale.objects.filter(created_at__date=today).aggregate(total=Sum('profit'))['total'] or 0
+        today_expense = Expense.objects.filter(created_at__date=today).aggregate(total=Sum('amount'))['total'] or 0
 
         total_sales = Sale.objects.aggregate(total=Sum('total_price'))['total'] or 0
         total_profit = Sale.objects.aggregate(total=Sum('profit'))['total'] or 0
         total_expense = Expense.objects.aggregate(total=Sum('amount'))['total'] or 0
-        
-        total_balance = Account.objects.aggregate(total=Sum('balance'))['total'] or 0
-        
-        total_inventory_value = sum(
-            product.stock * product.cost_price 
-            for product in Product.objects.all()
-        )
-        
-        pending_repairs = Repair.objects.filter(status='pending').count()
 
         last_7_days = []
         last_7_days_sales = []
         for i in range(6, -1, -1):
             day = today - timedelta(days=i)
             last_7_days.append(day.strftime('%m-%d'))
-            day_sales = Sale.objects.filter(created_at__date=day).aggregate(
-                total=Sum('total_price')
-            )['total'] or 0
-            last_7_days_sales.append(float(day_sales))
-
-        top_products = (
-            Sale.objects
-            .values('product__name')
-            .annotate(total_profit=Sum('profit'))
-            .order_by('-total_profit')[:10]
-        )
-
-        top_sales = (
-            Sale.objects
-            .values('product__name')
-            .annotate(total_sales=Sum('quantity'))
-            .order_by('-total_sales')[:10]
-        )
+            sales = Sale.objects.filter(created_at__date=day).aggregate(total=Sum('total_price'))['total'] or 0
+            last_7_days_sales.append(float(sales))
 
         extra_context = extra_context or {}
         extra_context.update({
@@ -460,25 +315,42 @@ class MyAdminSite(admin.AdminSite):
             'today_profit': today_profit,
             'today_expense': today_expense,
             'total_sales': total_sales,
-            'total_expense': total_expense,
             'total_profit': total_profit,
-            'net_profit': total_profit - total_expense,
-            'total_balance': total_balance,
-            'total_inventory_value': total_inventory_value,
-            'pending_repairs': pending_repairs,
+            'total_expense': total_expense,
             'last_7_days': json.dumps(last_7_days),
             'last_7_days_sales': json.dumps(last_7_days_sales),
-            'top_products': top_products,
-            'top_sales': top_sales,
         })
-
         return super().index(request, extra_context)
 
+    # 自定义视图入口
+    def initial_accounting_choice(self, request):
+        return views.initial_accounting_choice(request)
 
-# ================== 创建 admin_site 实例 ==================
+    def initial_stock(self, request):
+        return views.initial_stock(request)
+
+    def initial_receivable(self, request):
+        return views.initial_receivable(request)
+
+    def initial_cash(self, request):
+        return views.initial_cash(request)
+
+    def initial_finance(self, request):
+        return views.initial_finance(request)
+
+    def category_list(self, request, category_id=None):
+        return views.category_list(request, category_id)
+
+    def category_add(self, request, parent_id=None):
+        return views.category_add(request, parent_id)
+
+    def inventory_status(self, request):
+        return views.inventory_status(request)
+
+
+# ================== 注册默认 Admin ==================
 admin_site = MyAdminSite(name='myadmin')
 
-# 注册所有模型
 admin_site.register(Account, AccountAdmin)
 admin_site.register(Product, ProductAdmin)
 admin_site.register(StockIn, StockInAdmin)
@@ -494,3 +366,6 @@ admin_site.register(IncomeType, IncomeTypeAdmin)
 admin_site.register(ExpenseType, ExpenseTypeAdmin)
 admin_site.register(InitialAccounting, InitialAccountingAdmin)
 admin_site.register(ProductCategory, ProductCategoryAdmin)
+admin_site.register(ProductAttribute, ProductAttributeAdmin)
+admin_site.register(ProductAttributeValue, ProductAttributeValueAdmin)
+admin_site.register(ProductSKU)

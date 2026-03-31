@@ -197,7 +197,12 @@ JAZZMIN_SETTINGS = {
         "inventory.account",          # 银行账户
         "inventory.initialaccounting",# 初期建账
     ],
-    "custom_css": "admin/css/table_list.css",  # 统一的表格样式
+    
+    # css引用，表格统一样式
+    "custom_css": "admin/css/excel_style.css",
+    "custom_css": "admin/css/excel_style.css",  # 列表页样式
+
+
     "topmenu_sticky": True,
     "show_sidebar": True,
     "navigation_expanded": True,

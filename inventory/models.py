@@ -20,7 +20,7 @@ class ProductCategory(models.Model):
     """商品分类模型（支持无限级分类）"""
     name = models.CharField(max_length=100, verbose_name="分类名称")
     code = models.CharField(max_length=50, unique=True, verbose_name="分类编码")
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, verbose_name="父级分类")
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children', verbose_name="父级分类")
     level = models.IntegerField(default=1, verbose_name="层级")
     sort_order = models.IntegerField(default=0, verbose_name="排序")
     is_active = models.BooleanField(default=True, verbose_name="是否启用")
@@ -52,9 +52,30 @@ class ProductCategory(models.Model):
 
 class Product(models.Model):
     """商品模型"""
+    # 颜色选项
+    COLOR_CHOICES = (
+        ('', '无'),
+        ('black', '黑色'),
+        ('white', '白色'),
+        ('red', '红色'),
+        ('blue', '蓝色'),
+        ('green', '绿色'),
+        ('yellow', '黄色'),
+        ('purple', '紫色'),
+        ('pink', '粉色'),
+        ('gold', '金色'),
+        ('silver', '银色'),
+        ('gray', '灰色'),
+        ('orange', '橙色'),
+        ('brown', '棕色'),
+        ('custom', '其他'),
+    )
+    
     code = models.CharField(max_length=50, unique=True, verbose_name="商品编号", blank=True, null=True)
     brand = models.CharField(max_length=100, verbose_name="商品品牌", blank=True, default="")
     name = models.CharField(max_length=100, verbose_name="商品名称")
+    color = models.CharField(max_length=20, choices=COLOR_CHOICES, default='', blank=True, verbose_name="商品颜色")
+    color_hex = models.CharField(max_length=7, blank=True, default='', verbose_name="颜色代码(如:#FF0000)")
     category = models.ForeignKey(
         'ProductCategory', 
         on_delete=models.SET_NULL,
@@ -79,7 +100,16 @@ class Product(models.Model):
         verbose_name_plural = "商品信息"
         
     def __str__(self):
-        return f"[{self.code}] {self.brand} {self.name}" if self.brand else f"[{self.code}] {self.name}"
+        color_display = f" [{self.get_color_display()}]" if self.color else ""
+        return f"[{self.code}] {self.brand} {self.name}{color_display}" if self.brand else f"[{self.code}] {self.name}{color_display}"
+    
+    def get_color_display_value(self):
+        """获取颜色显示值"""
+        if self.color_hex:
+            return f'<span style="display:inline-block;width:20px;height:20px;background:{self.color_hex};border-radius:4px;"></span> {self.get_color_display()}'
+        return self.get_color_display()
+    get_color_display_value.allow_tags = True
+    get_color_display_value.short_description = '颜色'
     
     def save(self, *args, **kwargs):
         # 如果没有商品编号，自动生成
@@ -405,3 +435,52 @@ class InitialAccounting(models.Model):
 
     def __str__(self):
         return f"{self.account.name} - 期初余额: {self.initial_balance} (日期: {self.initial_date})"
+# ================== 新增 SKU 系统 ==================
+
+class ProductAttribute(models.Model):
+    """商品属性，例如颜色、容量"""
+    name = models.CharField(max_length=50, verbose_name="属性名称")
+
+    class Meta:
+        db_table = 'inventory_product_attribute'
+        verbose_name = "商品属性"
+        verbose_name_plural = "商品属性列表"
+
+    def __str__(self):
+        return self.name
+
+
+class ProductAttributeValue(models.Model):
+    """商品属性值，例如黑色、128G"""
+    attribute = models.ForeignKey(ProductAttribute, on_delete=models.CASCADE, related_name='values', verbose_name="属性")
+    value = models.CharField(max_length=50, verbose_name="属性值")
+
+    class Meta:
+        db_table = 'inventory_product_attribute_value'
+        verbose_name = "商品属性值"
+        verbose_name_plural = "商品属性值列表"
+
+    def __str__(self):
+        return f"{self.attribute.name}: {self.value}"
+
+
+class ProductSKU(models.Model):
+    """SKU 表，存储商品的具体规格组合"""
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='skus', verbose_name="商品")
+    attributes = models.JSONField(verbose_name="属性组合")  # 例如 {"颜色":"黑色","容量":"128G"}
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="售价")
+    stock = models.IntegerField(default=0, verbose_name="库存数量")
+    code = models.CharField(max_length=50, unique=True, verbose_name="SKU编号")
+
+    class Meta:
+        db_table = 'inventory_product_sku'
+        verbose_name = "商品SKU"
+        verbose_name_plural = "商品SKU列表"
+
+    def __str__(self):
+        return f"{self.product.name} - {self.attributes} ({self.code})"
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            self.code = str(uuid.uuid4())[:8]  # 自动生成 SKU 编号
+        super().save(*args, **kwargs)
