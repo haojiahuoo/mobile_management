@@ -31,25 +31,26 @@ ALLOWED_HOSTS = ['47.93.36.234', 'localhost', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
-    'jazzmin', 
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'rest_framework',   # 如果你用了 DRF  
-    'inventory.apps.InventoryConfig',  
+     
+    
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+
+    'django.contrib.sessions.middleware.SessionMiddleware',  # ⭐ 必须在前
+
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
+
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # ⭐ 依赖 session
+
+    'django.contrib.messages.middleware.MessageMiddleware',  # ⭐ admin 用这个
+
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'debug_toolbar.middleware.DebugToolbarMiddleware',  # 如果你用 debug_toolbar
+    
 ]
 
 ROOT_URLCONF = 'mobile_management.urls'
@@ -114,6 +115,42 @@ USE_I18N = True
 
 USE_TZ = True
 
+INSTALLED_APPS = [
+    'jazzmin',
+    'debug_toolbar',
+    'django.contrib.admin',        # ⭐ 这个就是报错关键
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',   # 如果你用了 DRF  
+    'inventory.apps.InventoryConfig',  
+]
+
+
+# 配置本地调试地址（127.0.0.1）
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+    },
+}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/

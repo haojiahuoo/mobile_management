@@ -1,0 +1,392 @@
+{% extends "admin/change_form.html" %}
+
+{% block content %}
+<div id="content-main" style="padding: 20px;">
+    <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.model_name }}_form" novalidate>
+        {% csrf_token %}
+        
+        <div style="background: #fff; border: 1px solid #ddd; border-radius: 6px; overflow-x: auto; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <table style="width: 100%; border-collapse: collapse; font-family: 'Segoe UI', 'Calibri', Arial, sans-serif; font-size: 13px;">
+                
+                <!-- 第一层分组标题行（主分类） -->
+                <thead>
+                    <tr style="background: #e8f0f7; border-bottom: 2px solid #79aec8;">
+                        <th colspan="4" style="border: 1px solid #ddd; padding: 10px 12px; text-align: center; font-weight: bold; font-size: 14px; color: #2c3e50;">
+                            📦 基本信息
+                        </th>
+                        <th colspan="3" style="border: 1px solid #ddd; padding: 10px 12px; text-align: center; font-weight: bold; font-size: 14px; color: #2c3e50;">
+                            🏷️ 分类与供应商
+                        </th>
+                        <th colspan="3" style="border: 1px solid #ddd; padding: 10px 12px; text-align: center; font-weight: bold; font-size: 14px; color: #2c3e50;">
+                            💰 价格与库存
+                        </th>
+                        <th colspan="2" style="border: 1px solid #ddd; padding: 10px 12px; text-align: center; font-weight: bold; font-size: 14px; color: #2c3e50;">
+                            ⚙️ 其他信息
+                        </th>
+                    </tr>
+                    
+                    <!-- 第二层字段标签行（子分类） -->
+                    <tr style="background: #f5f7fa; border-bottom: 1px solid #ddd;">
+                        <!-- 基本信息组 -->
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 120px;">
+                            商品编号 <span style="color: red;">*</span>
+                        </th>
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 120px;">
+                            商品品牌
+                        </th>
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 150px;">
+                            商品名称 <span style="color: red;">*</span>
+                        </th>
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 120px;">
+                            单位
+                        </th>
+                        
+                        <!-- 分类与供应商组 -->
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 150px;">
+                            商品分类
+                        </th>
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 150px;">
+                            供应商
+                        </th>
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 120px;">
+                            关联账户
+                        </th>
+                        
+                        <!-- 价格与库存组 -->
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 120px;">
+                            成本价 <span style="color: red;">*</span>
+                        </th>
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 120px;">
+                            售价
+                        </th>
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 100px;">
+                            库存数量
+                        </th>
+                        
+                        <!-- 其他信息组 -->
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 150px;">
+                            是否启用
+                        </th>
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 200px;">
+                            备注
+                        </th>
+                    </tr>
+                </thead>
+                
+                <!-- 第三行：值行 -->
+                <tbody>
+                    <tr style="background: #fff;">
+                        <!-- 基本信息值 -->
+                        <td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">
+                            {{ adminform.form.code }}
+                            {% if adminform.form.code.errors %}
+                                <div class="error-message">{{ adminform.form.code.errors }}</div>
+                            {% endif %}
+                            {% if adminform.form.code.help_text %}
+                                <div class="help-text">{{ adminform.form.code.help_text }}</div>
+                            {% endif %}
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            {{ adminform.form.brand }}
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            {{ adminform.form.name }}
+                            {% if adminform.form.name.errors %}
+                                <div class="error-message">{{ adminform.form.name.errors }}</div>
+                            {% endif %}
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            {{ adminform.form.unit }}
+                        </td>
+                        
+                        <!-- 分类与供应商值 -->
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            {{ adminform.form.category }}
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            {{ adminform.form.supplier }}
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            {{ adminform.form.account }}
+                        </td>
+                        
+                        <!-- 价格与库存值 -->
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            {{ adminform.form.cost_price }}
+                            {% if adminform.form.cost_price.errors %}
+                                <div class="error-message">{{ adminform.form.cost_price.errors }}</div>
+                            {% endif %}
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            {{ adminform.form.sell_price }}
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            {{ adminform.form.stock }}
+                        </td>
+                        
+                        <!-- 其他信息值 -->
+                        <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">
+                            {{ adminform.form.is_active }}
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            {{ adminform.form.remark }}
+                        </td>
+                    </tr>
+                    
+                    <!-- 颜色信息单独一行（因为需要特殊处理） -->
+                    <tr style="background: #fff;">
+                        <td colspan="4" style="border: 1px solid #ddd; padding: 8px 12px; background: #fef9e6;">
+                            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <strong style="min-width: 80px;">商品颜色：</strong>
+                                    {{ adminform.form.color }}
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <strong style="min-width: 80px;">颜色代码：</strong>
+                                    {{ adminform.form.color_hex }}
+                                    <div id="color-preview" style="width: 30px; height: 30px; border: 1px solid #ddd; border-radius: 4px;"></div>
+                                </div>
+                            </div>
+                            {% if adminform.form.color.errors %}
+                                <div class="error-message">{{ adminform.form.color.errors }}</div>
+                            {% endif %}
+                            {% if adminform.form.color_hex.errors %}
+                                <div class="error-message">{{ adminform.form.color_hex.errors }}</div>
+                            {% endif %}
+                        </td>
+                        <td colspan="7" style="border: 1px solid #ddd; padding: 8px 12px; background: #f5f5f5;">
+                            <div style="display: flex; align-items: center; gap: 20px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <strong>创建时间：</strong>
+                                    <span style="color: #666;">{{ adminform.form.instance.created_at|default:"未创建" }}</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <strong>更新时间：</strong>
+                                    <span style="color: #666;">{{ adminform.form.instance.updated_at|default:"未更新" }}</span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 隐藏字段 -->
+        {% for hidden in adminform.form.hidden_fields %}
+            {{ hidden }}
+        {% endfor %}
+        
+        <!-- 提交按钮区域 -->
+        <div class="submit-row" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px; display: flex; gap: 10px; align-items: center;">
+            <input type="submit" value="保存" class="default" name="_save" style="background: #79aec8; color: white; padding: 8px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+            <input type="submit" value="保存并继续编辑" name="_continue" style="padding: 8px 20px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background: white;">
+            <input type="submit" value="保存并添加另一个" name="_addanother" style="padding: 8px 20px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background: white;">
+            {% if show_delete_link %}
+                <a href="delete/" class="deletelink" style="margin-left: auto; color: #ba2121; text-decoration: none; padding: 8px 15px;">删除</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<style>
+    /* Excel 风格样式 */
+    table input, table select, table textarea {
+        width: 100%;
+        padding: 6px 8px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        box-sizing: border-box;
+        font-size: 13px;
+        font-family: inherit;
+        transition: all 0.2s;
+    }
+    
+    table input:focus, table select:focus, table textarea:focus {
+        border-color: #79aec8;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(121,174,200,0.2);
+    }
+    
+    /* 数字字段右对齐 */
+    td input[type="number"] {
+        text-align: right;
+    }
+    
+    /* 复选框样式 */
+    td input[type="checkbox"] {
+        width: auto;
+        margin: 0;
+        transform: scale(1.2);
+    }
+    
+    /* 错误消息样式 */
+    .error-message {
+        color: #ba2121;
+        font-size: 11px;
+        margin-top: 4px;
+        padding: 2px 4px;
+        background: #fff2f2;
+        border-radius: 3px;
+    }
+    
+    /* 帮助文本样式 */
+    .help-text {
+        color: #666;
+        font-size: 11px;
+        margin-top: 3px;
+        font-style: italic;
+    }
+    
+    /* 表格行悬停效果 */
+    tbody tr:hover {
+        background: #f9f9f9;
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 1400px) {
+        .excel-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            min-width: 1200px;
+        }
+    }
+    
+    /* 分组标题图标 */
+    th[colspan] {
+        background: linear-gradient(135deg, #e8f0f7 0%, #d9e4ef 100%);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 颜色预览功能
+        const colorHexInput = document.querySelector('#id_color_hex');
+        const colorPreview = document.querySelector('#color-preview');
+        const colorSelect = document.querySelector('#id_color');
+        
+        function updateColorPreview() {
+            if (colorHexInput && colorPreview) {
+                const color = colorHexInput.value;
+                if (color && /^#([0-9A-Fa-f]{3}){1,2}$/.test(color)) {
+                    colorPreview.style.backgroundColor = color;
+                    colorPreview.style.border = '1px solid #999';
+                } else {
+                    colorPreview.style.backgroundColor = '#fff';
+                    colorPreview.style.border = '1px solid #ddd';
+                }
+            }
+        }
+        
+        if (colorHexInput) {
+            colorHexInput.addEventListener('input', updateColorPreview);
+            updateColorPreview();
+        }
+        
+        // 当选择颜色时，自动填充建议的颜色代码
+        const colorPresets = {
+            'black': '#000000',
+            'white': '#FFFFFF',
+            'red': '#FF0000',
+            'blue': '#0000FF',
+            'green': '#00FF00',
+            'yellow': '#FFFF00',
+            'purple': '#800080',
+            'pink': '#FFC0CB',
+            'gold': '#FFD700',
+            'silver': '#C0C0C0',
+            'gray': '#808080',
+            'orange': '#FFA500',
+            'brown': '#A52A2A'
+        };
+        
+        if (colorSelect && colorHexInput) {
+            colorSelect.addEventListener('change', function() {
+                if (this.value && colorPresets[this.value] && !colorHexInput.value) {
+                    colorHexInput.value = colorPresets[this.value];
+                    updateColorPreview();
+                }
+            });
+        }
+        
+        // 售价自动建议（基于成本价）
+        const costPriceInput = document.querySelector('#id_cost_price');
+        const sellPriceInput = document.querySelector('#id_sell_price');
+        
+        if (costPriceInput && sellPriceInput) {
+            costPriceInput.addEventListener('blur', function() {
+                if (!sellPriceInput.value && this.value && parseFloat(this.value) > 0) {
+                    const suggestedPrice = (parseFloat(this.value) * 1.3).toFixed(2);
+                    sellPriceInput.value = suggestedPrice;
+                    
+                    // 添加一个提示
+                    const tip = document.createElement('div');
+                    tip.className = 'help-text';
+                    tip.style.color = '#2c7a2c';
+                    tip.innerHTML = '💡 建议售价已自动填入（成本价 × 1.3）';
+                    
+                    const parent = sellPriceInput.parentElement;
+                    const oldTip = parent.querySelector('.price-tip');
+                    if (oldTip) oldTip.remove();
+                    
+                    tip.classList.add('price-tip');
+                    parent.appendChild(tip);
+                    
+                    setTimeout(() => {
+                        if (tip.parentElement) tip.remove();
+                    }, 3000);
+                }
+            });
+        }
+        
+        // 添加键盘快捷键支持（Ctrl+Enter 保存）
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                const saveButton = document.querySelector('input[name="_save"]');
+                if (saveButton) saveButton.click();
+            }
+        });
+        
+        // 自动生成编号提示
+        const codeInput = document.querySelector('#id_code');
+        if (codeInput && !codeInput.value) {
+            const tip = document.createElement('div');
+            tip.className = 'help-text';
+            tip.innerHTML = '💡 留空将自动生成商品编号';
+            codeInput.parentElement.appendChild(tip);
+        }
+        
+        // 利润率实时计算显示
+        function updateProfitRate() {
+            const cost = parseFloat(costPriceInput?.value);
+            const sell = parseFloat(sellPriceInput?.value);
+            
+            if (cost && sell && !isNaN(cost) && !isNaN(sell) && cost > 0) {
+                const profit = sell - cost;
+                const rate = (profit / cost * 100).toFixed(1);
+                const profitColor = profit >= 0 ? '#2c7a2c' : '#ba2121';
+                
+                let profitDisplay = document.querySelector('#profit-display');
+                if (!profitDisplay) {
+                    profitDisplay = document.createElement('div');
+                    profitDisplay.id = 'profit-display';
+                    profitDisplay.style.marginTop = '5px';
+                    profitDisplay.style.fontSize = '12px';
+                    if (sellPriceInput && sellPriceInput.parentElement) {
+                        sellPriceInput.parentElement.appendChild(profitDisplay);
+                    }
+                }
+                
+                profitDisplay.innerHTML = `<span style="color: ${profitColor};">💰 利润率: ${rate}% (毛利: ¥${profit.toFixed(2)})</span>`;
+            }
+        }
+        
+        if (costPriceInput && sellPriceInput) {
+            costPriceInput.addEventListener('input', updateProfitRate);
+            sellPriceInput.addEventListener('input', updateProfitRate);
+        }
+    });
+</script>
+{% endblock %}

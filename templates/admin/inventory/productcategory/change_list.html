@@ -1,0 +1,34 @@
+{% extends "admin/change_list.html" %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">首页</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label='inventory' %}">库存管理</a>
+    &rsaquo; <a href="{% url 'admin:inventory_productcategory_changelist' %}">商品分类</a>
+    {% if breadcrumb %}
+        {% for crumb in breadcrumb %}
+            &rsaquo; <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+{# 显示返回按钮 #}
+{% if back_button %}
+    {{ back_button|safe }}
+{% endif %}
+
+{# 显示当前路径 #}
+{% if current_parent_name %}
+    <div style="margin-bottom: 15px; padding: 8px 12px; background: #e8f0fe; border-left: 4px solid #79aec8; border-radius: 3px;">
+        <strong>当前位置：</strong> {{ current_parent_name }}
+    </div>
+{% endif %}
+
+{{ block.super }}
+
+{% if custom_js %}
+    {{ custom_js|safe }}
+{% endif %}
+{% endblock %}
