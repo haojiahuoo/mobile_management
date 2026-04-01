@@ -1,34 +1,97 @@
-{% extends "admin/change_list.html" %}
-
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-    <a href="{% url 'admin:index' %}">首页</a>
-    &rsaquo; <a href="{% url 'admin:app_list' app_label='inventory' %}">库存管理</a>
-    &rsaquo; <a href="{% url 'admin:inventory_productcategory_changelist' %}">商品分类</a>
-    {% if breadcrumb %}
-        {% for crumb in breadcrumb %}
-            &rsaquo; <a href="{{ crumb.url }}">{{ crumb.name }}</a>
-        {% endfor %}
-    {% endif %}
-</div>
-{% endblock %}
-
-{% block content %}
-{# 显示返回按钮 #}
-{% if back_button %}
-    {{ back_button|safe }}
-{% endif %}
-
-{# 显示当前路径 #}
-{% if current_parent_name %}
-    <div style="margin-bottom: 15px; padding: 8px 12px; background: #e8f0fe; border-left: 4px solid #79aec8; border-radius: 3px;">
-        <strong>当前位置：</strong> {{ current_parent_name }}
+{% extends "admin/change_list.html" %} {% block content %}
+<div style="display: flex; gap: 20px; min-height: 500px">
+  <!-- 左侧：树形导航栏 -->
+  <div
+    style="
+      width: 320px;
+      background: #f8f9fa;
+      border-right: 1px solid #e9ecef;
+      padding: 15px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    "
+  >
+    <h3
+      style="
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-size: 16px;
+        color: #2c3e50;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #dee2e6;
+      "
+    >
+      📁 商品分类
+    </h3>
+    <div class="category-tree" style="max-height: 70vh; overflow-y: auto">
+      {{ category_tree|safe }}
     </div>
-{% endif %}
+  </div>
 
-{{ block.super }}
+  <!-- 右侧：当前分类下的列表 -->
+  <div style="flex: 1; min-width: 0">
+    {% if current_path %}
+    <div
+      style="
+        margin-bottom: 15px;
+        padding: 8px 12px;
+        background: #e8f0fe;
+        border-left: 4px solid #79aec8;
+        border-radius: 3px;
+      "
+    >
+      <strong>当前位置：</strong> {{ current_path }}
+    </div>
+    {% endif %} {{ block.super }}
+  </div>
+</div>
 
-{% if custom_js %}
-    {{ custom_js|safe }}
-{% endif %}
+{{ custom_js|safe }}
+
+<style>
+  .category-tree {
+    font-size: 14px;
+  }
+  .tree-item {
+    margin: 2px 0;
+    white-space: nowrap;
+  }
+  .tree-item a {
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-block;
+  }
+  .tree-item a:hover {
+    background: #e9ecef !important;
+  }
+  .tree-item.active a {
+    background: #e9ecef !important;
+    color: #0d6efd !important;
+    font-weight: bold !important;
+  }
+  .tree-toggle {
+    cursor: pointer;
+    color: #6c757d;
+    font-size: 12px;
+    user-select: none;
+  }
+  .tree-toggle:hover {
+    color: #0d6efd;
+  }
+  .tree-children {
+    margin-left: 20px;
+  }
+  .tree-prefix {
+    font-family: monospace;
+  }
+  .tree-folder-icon {
+    margin-right: 4px;
+  }
+  #result_list tbody tr {
+    cursor: pointer;
+  }
+  #result_list tbody tr:hover {
+    background: #f8f9fa;
+  }
+</style>
 {% endblock %}

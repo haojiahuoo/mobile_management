@@ -135,6 +135,13 @@ class ProductAdmin(admin.ModelAdmin):
             self.message_user(request, f'成功添加商品：{obj.name}', level='SUCCESS')
         else:
             self.message_user(request, f'成功更新商品：{obj.name}', level='SUCCESS')
+        
+        if obj.category:
+            if not obj.brand:
+                obj.brand = obj.category.brand
+            if not obj.specification:
+                obj.specification = obj.category.specification
+                
         super().save_model(request, obj, form, change)
     
     actions = ['batch_generate_sku', 'batch_update_stock', 'batch_set_active']
@@ -160,32 +167,45 @@ class ProductAdmin(admin.ModelAdmin):
         self.message_user(request, f'成功启用 {updated} 个商品')
     batch_set_active.short_description = '批量启用商品'
 
+    def get_changeform_initial_data(self, request):
+        initial = super().get_changeform_initial_data(request)
+        
+        category_id = request.GET.get('category')
+        if category_id:
+            initial['category'] = category_id
+        
+        return initial
 
+    def get_readonly_fields(self, request, obj=None):
+        readonly = list(super().get_readonly_fields(request, obj))
+        
+        if request.GET.get('category'):
+            readonly.append('category')
+        
+        return readonly
+    
 # ================== 分类管理 ==================
 @admin.register(ProductCategory)
 class ProductCategoryAdmin(BaseAdmin):
     """商品分类管理"""
     
+    # ========== 列表页显示字段 ==========
     list_display = (
-        'id',
-        'code', 
-        'name',
-        'brand_display',
-        'specification_display',
-        'model_display',
-        'retail_price_display',
-        'remark_display',
-        'is_active',
-        'category_action',
-        'edit_button'          # 添加编辑按钮列
+        'id', 'code', 'name',
+        'brand_display',      # 品牌（自定义显示）
+        'specification_display',  # 规格
+        'model_display',      # 型号
+        'retail_price_display',   # 零售价
+        'remark_display',     # 备注
+        'edit_button'         # 编辑按钮
     )
     
-    list_display_links = None
-    list_filter = ('parent', 'is_active', 'level')
-    search_fields = ['name', 'code', 'brand', 'model']
-    list_editable = ('is_active',)
-    list_per_page = 25
-    ordering = ['level', 'id']
+    list_display_links = None                           # 禁用默认的链接
+    # list_filter = ('parent', 'is_active', 'level')    # 右侧筛选器
+    search_fields = ['name', 'code', 'brand', 'model']  # 可搜索字段
+    list_editable = ()            # 不可直接编辑
+    list_per_page = 25            # 每页显示25条
+    ordering = ['level', 'id']    # 按层级和ID排序
     
     # ========== 列表页只读显示方法 ==========
     def brand_display(self, obj):
@@ -208,28 +228,14 @@ class ProductCategoryAdmin(BaseAdmin):
     
     def remark_display(self, obj):
         if obj.remark:
-            return obj.remark[:50] + ('...' if len(obj.remark) > 50 else '')
+            return obj.remark[:10] + ('...' if len(obj.remark) > 10 else '')
         return '-'
     remark_display.short_description = '商品备注'
-    
-    # ========== 复选框列 ==========
-    def category_action(self, obj):
-        """显示"这是一个分类"复选框"""
-        return mark_safe(
-            '<div style="text-align: center;">'
-            '<input type="checkbox" class="leaf-checkbox" data-id="{}" data-name="{}" {} '
-            'style="width: 18px; height: 18px; cursor: pointer;">'
-            '</div>'.format(
-                obj.id,
-                obj.name,
-                'checked' if obj.is_leaf_category else ''
-            )
-        )
-    category_action.short_description = '这是一个分类'
     
     # ========== 编辑按钮 ==========
     def edit_button(self, obj):
         """编辑按钮"""
+        from django.urls import reverse
         return mark_safe(
             '<a href="{}" class="edit-link" style="display: inline-block; background: #79aec8; color: white; padding: 4px 10px; text-decoration: none; border-radius: 3px; font-size: 12px;">'
             '✏️ 编辑'
@@ -274,199 +280,248 @@ class ProductCategoryAdmin(BaseAdmin):
                     obj.code = f"{(last_num + 1):04d}"
                 else:
                     obj.code = "0001"
-        
+
         super().save_model(request, obj, form, change)
     
     # ========== 表单页配置 ==========
     fieldsets = (
         ('分类信息', {
-            'fields': ('name', 'parent', 'is_active', 'is_leaf_category'),
+            #name(名称)、parent(父级分类)、is_active(是否启用)
+            'fields': ('name', 'parent', 'is_active'), 
         }),
         ('商品信息', {
+                        # 品牌、      规格、        型号、      零售价、       备注
             'fields': ('brand', 'specification', 'model', 'retail_price', 'remark'),
-            'classes': ('collapse',),
+            'classes': ('collapse',),   # 这个分组默认折叠，点击才展开（适用于非核心信息）
             'description': '这些信息将作为该分类下新商品的默认值'
         }),
     )
-    
+    '''
+    这些字段在编辑页面只能看不能改，通常用于：
+        code：系统自动生成的编码
+        level：自动计算的层级
+        created_at：创建时间戳（不可修改）
+    '''
     readonly_fields = ['code', 'level', 'created_at']
     
-    # ========== 面包屑导航和返回按钮 ==========
+    # ========== 树形结构构建方法 ==========
+    def _build_tree_html(self, categories, parent_id=None, level=0, expand_ids=None):
+        """构建可折叠的树形结构HTML"""
+        if expand_ids is None:
+            expand_ids = []
+        
+        html = ''
+        siblings = [cat for cat in categories if cat.parent_id == parent_id]
+        
+        for i, cat in enumerate(siblings):
+            is_last = (i == len(siblings) - 1)
+            children = categories.filter(parent_id=cat.id)
+            has_children = children.exists()
+            
+            # 构建前缀
+            prefix = ''
+            if level > 0:
+                prefix = ' ' * (level - 1)
+                if is_last:
+                    prefix += '└'
+                else:
+                    prefix += '├'
+            
+            # 判断是否默认展开
+            is_expanded = cat.id in expand_ids
+            display_style = 'block' if is_expanded else 'none'
+            toggle_icon = '▼' if is_expanded else '▶'
+            
+            # 高亮当前选中的分类
+            current_parent = self.request.GET.get('parent')
+            is_active = str(cat.id) == current_parent
+            
+            # 文件夹图标
+            folder_icon = '📁' if has_children else '📄'
+            
+            html += f'''
+            <div class="tree-node" style="margin: 2px 0;">
+                <div class="tree-item" style="white-space: nowrap; 
+                    background: {is_active and '#e9ecef' or 'transparent'};
+                    font-weight: {is_active and 'bold' or 'normal'};">
+                    <span class="tree-prefix" style="color: #6c757d;">{prefix}</span>
+                    <span class="tree-folder-icon">{folder_icon}</span>
+                    <a href="?parent={cat.id}" data-id="{cat.id}" 
+                    data-has-children="{str(has_children).lower()}"
+                    class="tree-link {'has-children' if has_children else 'no-children'}"
+                    style="text-decoration: none; color: {is_active and '#0d6efd' or '#2c3e50'};">
+                        {cat.name}
+                    </a>
+                    {f'<span class="tree-toggle" data-id="{cat.id}" style="cursor: pointer; margin-left: 5px; color: #6c757d;">{toggle_icon}</span>' if has_children else ''}
+                </div>
+                <div class="tree-children" id="children_{cat.id}" style="display: {display_style}; margin-left: 20px;">
+                    {self._build_tree_html(categories, cat.id, level + 1, expand_ids) if has_children else ''}
+                </div>
+            </div>
+            '''
+        
+        return html
+    
+    def _get_category_path(self, category):
+        """获取分类的完整路径"""
+        path = []
+        current = category
+        while current:
+            path.insert(0, current.name)
+            current = current.parent
+        return ' > '.join(path)
+    
+    # ========== 主视图 ==========
     def changelist_view(self, request, extra_context=None):
-        from django.urls import reverse
+        """列表页视图 - 添加树形导航"""
         
         extra_context = extra_context or {}
+        self.request = request
         
+        # 获取需要展开的所有父级ID
+        def _get_expand_ids(category):
+            ids = []
+            current = category
+            while current:
+                ids.append(current.id)
+                current = current.parent
+            return ids
+        
+        # 获取所有分类
+        all_categories = ProductCategory.objects.filter(is_active=True).order_by('level', 'id')
+        
+        # 获取当前选中分类的完整路径
         parent_id = request.GET.get('parent')
+        current_path = ''
+        expand_ids = []
         
         if parent_id:
             try:
                 current = ProductCategory.objects.get(id=parent_id)
-                
-                # 构建面包屑
-                breadcrumb = []
-                temp = current
-                while temp:
-                    breadcrumb.insert(0, {
-                        'id': temp.id,
-                        'name': temp.name,
-                        'url': f'?parent={temp.id}'
-                    })
-                    temp = temp.parent
-                breadcrumb.insert(0, {'id': None, 'name': '全部', 'url': '?'})
-                extra_context['breadcrumb'] = breadcrumb
-                extra_context['current_parent_name'] = current.name
-                
-                # 返回按钮
-                if current.parent:
-                    back_url = f'?parent={current.parent.id}'
-                    back_text = f'返回 {current.parent.name}'
-                else:
-                    back_url = '?'
-                    back_text = '返回全部'
-                extra_context['back_button'] = mark_safe(
-                    '<div style="margin-bottom: 15px;">'
-                    '<a href="{}" class="button" style="background: #6c757d; color: white; padding: 5px 12px; text-decoration: none; border-radius: 3px;">'
-                    '← {}'
-                    '</a>'
-                    '</div>'.format(back_url, back_text)
-                )
-                
-            except Exception as e:
-                print(f"Error: {e}")
+                current_path = self._get_category_path(current)
+                expand_ids = _get_expand_ids(current)
+            except ProductCategory.DoesNotExist:
                 pass
         
+        # 构建树形结构（传入 expand_ids）
+        category_tree = self._build_tree_html(all_categories, expand_ids=expand_ids)
+        
+        # 传递给模板
+        extra_context['expand_ids'] = expand_ids
+        extra_context['category_tree'] = mark_safe(category_tree)
+        extra_context['current_path'] = current_path
         extra_context['custom_js'] = self._get_custom_js()
         
         return super().changelist_view(request, extra_context=extra_context)
     
+    # ========== JavaScript ==========
     def _get_custom_js(self):
         return '''
         <script>
-        console.log('=== 分类管理JS已加载 ===');
-        
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM加载完成');
-            
-            // 绑定双击事件
-            const rows = document.querySelectorAll('#result_list tbody tr');
-            console.log('找到 ' + rows.length + ' 行');
-            
-            rows.forEach((row, index) => {
-                row.style.cursor = 'pointer';
-                
-                row.addEventListener('dblclick', function(e) {
-                    // 如果点击的是编辑按钮或复选框，不触发双击
-                    if (e.target.tagName === 'A' || e.target.type === 'checkbox') {
-                        return;
-                    }
-                    
-                    console.log('双击了第 ' + index + ' 行');
-                    
-                    const checkbox = this.querySelector('.leaf-checkbox');
-                    if (!checkbox) {
-                        console.log('未找到复选框');
-                        return;
-                    }
-                    
-                    const categoryId = checkbox.getAttribute('data-id');
-                    const isLeaf = checkbox.checked;
-                    
-                    console.log('分类ID:', categoryId, '是否叶子:', isLeaf);
-                    
-                    if (isLeaf) {
-                        window.location.href = '/admin/inventory/product/add/?category=' + categoryId;
-                    } else {
-                        window.location.href = '?parent=' + categoryId;
-                    }
-                });
-            });
-            
-            // 绑定复选框变化事件
-            const checkboxes = document.querySelectorAll('.leaf-checkbox');
-            console.log('找到 ' + checkboxes.length + ' 个复选框');
-            
-            checkboxes.forEach(cb => {
-                cb.addEventListener('change', function(e) {
-                    e.stopPropagation();
-                    const categoryId = this.getAttribute('data-id');
-                    const isChecked = this.checked;
-                    
-                    console.log('复选框变化:', categoryId, isChecked);
-                    
-                    fetch('/admin/inventory/productcategory/update-leaf-status/', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': getCookie('csrftoken')
-                        },
-                        body: JSON.stringify({
-                            category_id: categoryId,
-                            is_leaf: isChecked
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('AJAX响应:', data);
-                        if (data.success && isChecked) {
-                            location.reload();
+            // 加载保存的展开状态
+            function loadExpandedState() {
+                const expanded = localStorage.getItem('category_tree_expanded');
+                if (expanded) {
+                    const expandedIds = JSON.parse(expanded);
+                    expandedIds.forEach(id => {
+                        const childrenDiv = document.getElementById('children_' + id);
+                        const toggleSpan = document.querySelector(`.tree-toggle[data-id="${id}"]`);
+                        if (childrenDiv && toggleSpan) {
+                            childrenDiv.style.display = 'block';
+                            toggleSpan.textContent = '▼';
                         }
-                    })
-                    .catch(error => console.error('Error:', error));
-                });
-            });
-        });
-        
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
+                    });
                 }
             }
-            return cookieValue;
-        }
+            
+            document.querySelectorAll('.tree-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const hasChildren = this.getAttribute('data-has-children') === 'true';
+                    
+                    if (!hasChildren) {
+                        e.preventDefault();  // 🚫 阻止跳转
+                    }
+                });
+            });
+
+            // 保存展开状态
+            function saveExpandedState() {
+                const expandedIds = [];
+                document.querySelectorAll('.tree-children').forEach(children => {
+                    if (children.style.display === 'block') {
+                        const id = children.id.replace('children_', '');
+                        expandedIds.push(id);
+                    }
+                });
+                localStorage.setItem('category_tree_expanded', JSON.stringify(expandedIds));
+            }
+            
+            // 绑定折叠/展开事件
+            document.querySelectorAll('.tree-toggle').forEach(toggle => {
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const categoryId = this.getAttribute('data-id');
+                    const childrenDiv = document.getElementById('children_' + categoryId);
+                    
+                    if (childrenDiv) {
+                        if (childrenDiv.style.display === 'none' || !childrenDiv.style.display) {
+                            childrenDiv.style.display = 'block';
+                            this.textContent = '▼';
+                        } else {
+                            childrenDiv.style.display = 'none';
+                            this.textContent = '▶';
+                        }
+                    }
+                });
+            });
+
+            document.querySelectorAll('.tree-item a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // 不阻止跳转
+                });
+            });
+
+            // 为右侧列表添加双击事件
+            const rows = document.querySelectorAll('#result_list tbody tr');
+            rows.forEach(row => {
+                row.style.cursor = 'pointer';
+                row.addEventListener('dblclick', function(e) {
+                    if (e.target.tagName === 'A' || e.target.closest('.edit-link')) {
+                        return;
+                    }
+                    
+                    const firstCell = this.querySelector('td:first-child');
+                    if (!firstCell) return;
+                    
+                    let categoryId = firstCell.textContent.trim();
+                    const idInput = this.querySelector('input[name="_selected_action"]');
+                    if (idInput) {
+                        categoryId = idInput.value;
+                    }
+                    
+                    if (categoryId) {
+                        const hasChildren = this.querySelector('.button') !== null;
+                        if (hasChildren) {
+                            window.location.href = '?parent=' + categoryId;
+                        } else {
+                            window.location.href = '/admin/inventory/product/add/?category=' + categoryId;
+                        }
+                    }
+                });
+            });
+            
+            // 自动滚动到当前选中的分类
+            const activeLink = document.querySelector('.tree-item a[style*="font-weight: bold"]');
+            if (activeLink) {
+                activeLink.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
         </script>
         '''
-    
-    # ========== AJAX 视图 ==========
-    def get_urls(self):
-        urls = super().get_urls()
-        custom_urls = [
-            path('update-leaf-status/', self.admin_site.admin_view(self.update_leaf_status), name='update-leaf-status'),
-        ]
-        return custom_urls + urls
-    
-    def update_leaf_status(self, request):
-        import json
-        from django.http import JsonResponse
-        
-        if request.method == 'POST':
-            data = json.loads(request.body)
-            category_id = data.get('category_id')
-            is_leaf = data.get('is_leaf')
-            
-            try:
-                category = ProductCategory.objects.get(id=category_id)
-                category.is_leaf_category = is_leaf
-                if is_leaf:
-                    category.children.all().delete()
-                category.save()
-                return JsonResponse({'success': True})
-            except Exception as e:
-                return JsonResponse({'success': False, 'error': str(e)})
-        
-        return JsonResponse({'success': False, 'error': 'Invalid method'})
-    
-    class Media:
-        js = ('admin/js/productcategory.js',)
-        
-        
+     
 # ================== SKU 属性管理 ==================
 @admin.register(ProductAttribute)
 class ProductAttributeAdmin(admin.ModelAdmin):

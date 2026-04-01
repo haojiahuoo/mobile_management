@@ -14,11 +14,8 @@
                         <th colspan="4" style="border: 1px solid #ddd; padding: 10px 12px; text-align: center; font-weight: bold; font-size: 14px; color: #2c3e50;">
                             📦 基本信息
                         </th>
-                        <th colspan="3" style="border: 1px solid #ddd; padding: 10px 12px; text-align: center; font-weight: bold; font-size: 14px; color: #2c3e50;">
-                            🏷️ 分类与供应商
-                        </th>
-                        <th colspan="3" style="border: 1px solid #ddd; padding: 10px 12px; text-align: center; font-weight: bold; font-size: 14px; color: #2c3e50;">
-                            💰 价格与库存
+                        <th colspan="2" style="border: 1px solid #ddd; padding: 10px 12px; text-align: center; font-weight: bold; font-size: 14px; color: #2c3e50;">
+                            🏷️ 分类与价格
                         </th>
                         <th colspan="2" style="border: 1px solid #ddd; padding: 10px 12px; text-align: center; font-weight: bold; font-size: 14px; color: #2c3e50;">
                             ⚙️ 其他信息
@@ -29,7 +26,7 @@
                     <tr style="background: #f5f7fa; border-bottom: 1px solid #ddd;">
                         <!-- 基本信息组 -->
                         <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 120px;">
-                            商品编号 <span style="color: red;">*</span>
+                            商品编号
                         </th>
                         <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 120px;">
                             商品品牌
@@ -37,148 +34,196 @@
                         <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 150px;">
                             商品名称 <span style="color: red;">*</span>
                         </th>
-                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 120px;">
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 100px;">
                             单位
                         </th>
                         
-                        <!-- 分类与供应商组 -->
+                        <!-- 分类与价格组 -->
                         <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 150px;">
                             商品分类
-                        </th>
-                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 150px;">
-                            供应商
-                        </th>
-                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 120px;">
-                            关联账户
-                        </th>
-                        
-                        <!-- 价格与库存组 -->
-                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 120px;">
-                            成本价 <span style="color: red;">*</span>
                         </th>
                         <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 120px;">
                             售价
                         </th>
-                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 100px;">
-                            库存数量
-                        </th>
                         
                         <!-- 其他信息组 -->
-                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 150px;">
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 100px;">
                             是否启用
                         </th>
-                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 200px;">
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 150px;">
                             备注
                         </th>
                     </tr>
                 </thead>
                 
-                <!-- 第三行：值行 -->
+                <!-- 值行 - 显示5行便于批量添加 -->
                 <tbody>
                     <tr style="background: #fff;">
-                        <!-- 基本信息值 -->
                         <td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">
-                            {{ adminform.form.code }}
-                            {% if adminform.form.code.errors %}
-                                <div class="error-message">{{ adminform.form.code.errors }}</div>
-                            {% endif %}
-                            {% if adminform.form.code.help_text %}
-                                <div class="help-text">{{ adminform.form.code.help_text }}</div>
-                            {% endif %}
+                            <input type="text" name="code_1" id="id_code_1" class="code-field" readonly style="background: #f5f5f5; color: #666; cursor: not-allowed; width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;" value="自动生成">
                         </td>
                         <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            {{ adminform.form.brand }}
+                            <input type="text" name="brand_1" id="id_brand_1" class="brand-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
                         </td>
                         <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            {{ adminform.form.name }}
-                            {% if adminform.form.name.errors %}
-                                <div class="error-message">{{ adminform.form.name.errors }}</div>
-                            {% endif %}
+                            <input type="text" name="name_1" id="id_name_1" class="name-field" required style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
                         </td>
                         <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            {{ adminform.form.unit }}
-                        </td>
-                        
-                        <!-- 分类与供应商值 -->
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            {{ adminform.form.category }}
+                            <input type="text" name="unit_1" id="id_unit_1" class="unit-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
                         </td>
                         <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            {{ adminform.form.supplier }}
+                            <select name="category" id="id_category" class="category-field"
+                                style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                                
+                                <option value="">---------</option>
+                                
+                                {% for category in categories %}
+                                <option value="{{ category.id }}"
+                                    {% if adminform.form.category.value == category.id %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                                {% endfor %}
+                                
+                            </select>
                         </td>
                         <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            {{ adminform.form.account }}
+                            <input type="number" name="sell_price_1" id="id_sell_price_1" step="0.01" class="sell-price-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px; text-align: right;">
                         </td>
-                        
-                        <!-- 价格与库存值 -->
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            {{ adminform.form.cost_price }}
-                            {% if adminform.form.cost_price.errors %}
-                                <div class="error-message">{{ adminform.form.cost_price.errors }}</div>
-                            {% endif %}
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            {{ adminform.form.sell_price }}
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            {{ adminform.form.stock }}
-                        </td>
-                        
-                        <!-- 其他信息值 -->
                         <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">
-                            {{ adminform.form.is_active }}
+                            <input type="checkbox" name="is_active_1" id="id_is_active_1" class="is-active-field" checked style="width: auto; margin: 0; transform: scale(1.2);">
                         </td>
                         <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            {{ adminform.form.remark }}
+                            <input type="text" name="remark_1" id="id_remark_1" class="remark-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
                         </td>
                     </tr>
-                    
-                    <!-- 颜色信息单独一行（因为需要特殊处理） -->
-                    <tr style="background: #fff;">
-                        <td colspan="4" style="border: 1px solid #ddd; padding: 8px 12px; background: #fef9e6;">
-                            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <strong style="min-width: 80px;">商品颜色：</strong>
-                                    {{ adminform.form.color }}
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <strong style="min-width: 80px;">颜色代码：</strong>
-                                    {{ adminform.form.color_hex }}
-                                    <div id="color-preview" style="width: 30px; height: 30px; border: 1px solid #ddd; border-radius: 4px;"></div>
-                                </div>
-                            </div>
-                            {% if adminform.form.color.errors %}
-                                <div class="error-message">{{ adminform.form.color.errors }}</div>
-                            {% endif %}
-                            {% if adminform.form.color_hex.errors %}
-                                <div class="error-message">{{ adminform.form.color_hex.errors }}</div>
-                            {% endif %}
+                    <tr style="background: #f9f9f9;">
+                        <td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">
+                            <input type="text" name="code_2" id="id_code_2" class="code-field" readonly style="background: #f5f5f5; color: #666; cursor: not-allowed; width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;" value="自动生成">
                         </td>
-                        <td colspan="7" style="border: 1px solid #ddd; padding: 8px 12px; background: #f5f5f5;">
-                            <div style="display: flex; align-items: center; gap: 20px;">
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <strong>创建时间：</strong>
-                                    <span style="color: #666;">{{ adminform.form.instance.created_at|default:"未创建" }}</span>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <strong>更新时间：</strong>
-                                    <span style="color: #666;">{{ adminform.form.instance.updated_at|default:"未更新" }}</span>
-                                </div>
-                            </div>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="text" name="brand_2" id="id_brand_2" class="brand-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="text" name="name_2" id="id_name_2" class="name-field" required style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="text" name="unit_2" id="id_unit_2" class="unit-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <select name="category_id_1" id="id_category_1" class="category-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                                <option value="">---------</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}" 
+                                    {% if original.category.id == category.id or request.GET.category_id|add:"0" == category.id %}
+                                        selected
+                                    {% endif %}>
+                                    {% for i in "x"|ljust:category.level %}　{% endfor %}{{ category.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="number" name="sell_price_2" id="id_sell_price_2" step="0.01" class="sell-price-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px; text-align: right;">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">
+                            <input type="checkbox" name="is_active_2" id="id_is_active_2" class="is-active-field" checked style="width: auto; margin: 0; transform: scale(1.2);">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="text" name="remark_2" id="id_remark_2" class="remark-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                        </td>
+                    </tr>
+                    <tr style="background: #fff;">
+                        <td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">
+                            <input type="text" name="code_3" id="id_code_3" class="code-field" readonly style="background: #f5f5f5; color: #666; cursor: not-allowed; width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;" value="自动生成">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="text" name="brand_3" id="id_brand_3" class="brand-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="text" name="name_3" id="id_name_3" class="name-field" required style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="text" name="unit_3" id="id_unit_3" class="unit-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="text" name="category_3" id="id_category_3" class="category-field" readonly style="background: #f5f5f5; color: #666; cursor: not-allowed; width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;" value="{% if original.category.name %}{{ original.category.name }}{% elif request.GET.category_name %}{{ request.GET.category_name }}{% else %}未选择分类{% endif %}">
+                            <input type="hidden" name="category_id_3" id="id_category_id_3" value="{% if original.category.id %}{{ original.category.id }}{% elif request.GET.category_id %}{{ request.GET.category_id }}{% endif %}">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="number" name="sell_price_3" id="id_sell_price_3" step="0.01" class="sell-price-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px; text-align: right;">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">
+                            <input type="checkbox" name="is_active_3" id="id_is_active_3" class="is-active-field" checked style="width: auto; margin: 0; transform: scale(1.2);">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="text" name="remark_3" id="id_remark_3" class="remark-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                        </td>
+                    </tr>
+                    <tr style="background: #f9f9f9;">
+                        <td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">
+                            <input type="text" name="code_4" id="id_code_4" class="code-field" readonly style="background: #f5f5f5; color: #666; cursor: not-allowed; width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;" value="自动生成">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="text" name="brand_4" id="id_brand_4" class="brand-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="text" name="name_4" id="id_name_4" class="name-field" required style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="text" name="unit_4" id="id_unit_4" class="unit-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="text" name="category_4" id="id_category_4" class="category-field" readonly style="background: #f5f5f5; color: #666; cursor: not-allowed; width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;" value="{% if original.category.name %}{{ original.category.name }}{% elif request.GET.category_name %}{{ request.GET.category_name }}{% else %}未选择分类{% endif %}">
+                            <input type="hidden" name="category_id_4" id="id_category_id_4" value="{% if original.category.id %}{{ original.category.id }}{% elif request.GET.category_id %}{{ request.GET.category_id }}{% endif %}">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="number" name="sell_price_4" id="id_sell_price_4" step="0.01" class="sell-price-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px; text-align: right;">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">
+                            <input type="checkbox" name="is_active_4" id="id_is_active_4" class="is-active-field" checked style="width: auto; margin: 0; transform: scale(1.2);">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="text" name="remark_4" id="id_remark_4" class="remark-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                        </td>
+                    </tr>
+                    <tr style="background: #fff;">
+                        <td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">
+                            <input type="text" name="code_5" id="id_code_5" class="code-field" readonly style="background: #f5f5f5; color: #666; cursor: not-allowed; width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;" value="自动生成">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="text" name="brand_5" id="id_brand_5" class="brand-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="text" name="name_5" id="id_name_5" class="name-field" required style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="text" name="unit_5" id="id_unit_5" class="unit-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="text" name="category_5" id="id_category_5" class="category-field" readonly style="background: #f5f5f5; color: #666; cursor: not-allowed; width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;" value="{% if original.category.name %}{{ original.category.name }}{% elif request.GET.category_name %}{{ request.GET.category_name }}{% else %}未选择分类{% endif %}">
+                            <input type="hidden" name="category_id_5" id="id_category_id_5" value="{% if original.category.id %}{{ original.category.id }}{% elif request.GET.category_id %}{{ request.GET.category_id }}{% endif %}">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="number" name="sell_price_5" id="id_sell_price_5" step="0.01" class="sell-price-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px; text-align: right;">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">
+                            <input type="checkbox" name="is_active_5" id="id_is_active_5" class="is-active-field" checked style="width: auto; margin: 0; transform: scale(1.2);">
+                        </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="text" name="remark_5" id="id_remark_5" class="remark-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
-        <!-- 隐藏字段 -->
-        {% for hidden in adminform.form.hidden_fields %}
-            {{ hidden }}
-        {% endfor %}
+        <!-- 隐藏字段 - 用于传递分类信息 -->
+        <input type="hidden" name="default_category_id" id="default_category_id" value="{% if original.category.id %}{{ original.category.id }}{% elif request.GET.category_id %}{{ request.GET.category_id }}{% endif %}">
+        <input type="hidden" name="default_category_name" id="default_category_name" value="{% if original.category.name %}{{ original.category.name }}{% elif request.GET.category_name %}{{ request.GET.category_name }}{% else %}未选择分类{% endif %}">
         
         <!-- 提交按钮区域 -->
         <div class="submit-row" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px; display: flex; gap: 10px; align-items: center;">
-            <input type="submit" value="保存" class="default" name="_save" style="background: #79aec8; color: white; padding: 8px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+            <input type="submit" value="批量保存" class="default" name="_save" style="background: #79aec8; color: white; padding: 8px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
             <input type="submit" value="保存并继续编辑" name="_continue" style="padding: 8px 20px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background: white;">
             <input type="submit" value="保存并添加另一个" name="_addanother" style="padding: 8px 20px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background: white;">
             {% if show_delete_link %}
@@ -239,17 +284,17 @@
     
     /* 表格行悬停效果 */
     tbody tr:hover {
-        background: #f9f9f9;
+        background: #f0f7ff !important;
     }
     
     /* 响应式设计 */
-    @media (max-width: 1400px) {
+    @media (max-width: 1200px) {
         .excel-container {
             overflow-x: auto;
         }
         
         table {
-            min-width: 1200px;
+            min-width: 900px;
         }
     }
     
@@ -257,87 +302,33 @@
     th[colspan] {
         background: linear-gradient(135deg, #e8f0f7 0%, #d9e4ef 100%);
     }
+    
+    /* 只读字段样式 */
+    input[readonly] {
+        background-color: #f5f5f5;
+        cursor: not-allowed;
+    }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // 颜色预览功能
-        const colorHexInput = document.querySelector('#id_color_hex');
-        const colorPreview = document.querySelector('#color-preview');
-        const colorSelect = document.querySelector('#id_color');
+        // 获取默认分类信息
+        const defaultCategoryId = document.getElementById('default_category_id').value;
+        const defaultCategoryName = document.getElementById('default_category_name').value;
         
-        function updateColorPreview() {
-            if (colorHexInput && colorPreview) {
-                const color = colorHexInput.value;
-                if (color && /^#([0-9A-Fa-f]{3}){1,2}$/.test(color)) {
-                    colorPreview.style.backgroundColor = color;
-                    colorPreview.style.border = '1px solid #999';
-                } else {
-                    colorPreview.style.backgroundColor = '#fff';
-                    colorPreview.style.border = '1px solid #ddd';
-                }
+        // 自动生成编号的函数
+        function generateCode(rowIndex) {
+            const timestamp = Date.now();
+            const random = Math.floor(Math.random() * 1000);
+            return `PROD-${timestamp}-${random}-${rowIndex}`;
+        }
+        
+        // 初始化所有编号
+        for (let i = 1; i <= 5; i++) {
+            const codeField = document.getElementById(`id_code_${i}`);
+            if (codeField && codeField.value === '自动生成') {
+                codeField.value = generateCode(i);
             }
-        }
-        
-        if (colorHexInput) {
-            colorHexInput.addEventListener('input', updateColorPreview);
-            updateColorPreview();
-        }
-        
-        // 当选择颜色时，自动填充建议的颜色代码
-        const colorPresets = {
-            'black': '#000000',
-            'white': '#FFFFFF',
-            'red': '#FF0000',
-            'blue': '#0000FF',
-            'green': '#00FF00',
-            'yellow': '#FFFF00',
-            'purple': '#800080',
-            'pink': '#FFC0CB',
-            'gold': '#FFD700',
-            'silver': '#C0C0C0',
-            'gray': '#808080',
-            'orange': '#FFA500',
-            'brown': '#A52A2A'
-        };
-        
-        if (colorSelect && colorHexInput) {
-            colorSelect.addEventListener('change', function() {
-                if (this.value && colorPresets[this.value] && !colorHexInput.value) {
-                    colorHexInput.value = colorPresets[this.value];
-                    updateColorPreview();
-                }
-            });
-        }
-        
-        // 售价自动建议（基于成本价）
-        const costPriceInput = document.querySelector('#id_cost_price');
-        const sellPriceInput = document.querySelector('#id_sell_price');
-        
-        if (costPriceInput && sellPriceInput) {
-            costPriceInput.addEventListener('blur', function() {
-                if (!sellPriceInput.value && this.value && parseFloat(this.value) > 0) {
-                    const suggestedPrice = (parseFloat(this.value) * 1.3).toFixed(2);
-                    sellPriceInput.value = suggestedPrice;
-                    
-                    // 添加一个提示
-                    const tip = document.createElement('div');
-                    tip.className = 'help-text';
-                    tip.style.color = '#2c7a2c';
-                    tip.innerHTML = '💡 建议售价已自动填入（成本价 × 1.3）';
-                    
-                    const parent = sellPriceInput.parentElement;
-                    const oldTip = parent.querySelector('.price-tip');
-                    if (oldTip) oldTip.remove();
-                    
-                    tip.classList.add('price-tip');
-                    parent.appendChild(tip);
-                    
-                    setTimeout(() => {
-                        if (tip.parentElement) tip.remove();
-                    }, 3000);
-                }
-            });
         }
         
         // 添加键盘快捷键支持（Ctrl+Enter 保存）
@@ -348,45 +339,6 @@
                 if (saveButton) saveButton.click();
             }
         });
-        
-        // 自动生成编号提示
-        const codeInput = document.querySelector('#id_code');
-        if (codeInput && !codeInput.value) {
-            const tip = document.createElement('div');
-            tip.className = 'help-text';
-            tip.innerHTML = '💡 留空将自动生成商品编号';
-            codeInput.parentElement.appendChild(tip);
-        }
-        
-        // 利润率实时计算显示
-        function updateProfitRate() {
-            const cost = parseFloat(costPriceInput?.value);
-            const sell = parseFloat(sellPriceInput?.value);
-            
-            if (cost && sell && !isNaN(cost) && !isNaN(sell) && cost > 0) {
-                const profit = sell - cost;
-                const rate = (profit / cost * 100).toFixed(1);
-                const profitColor = profit >= 0 ? '#2c7a2c' : '#ba2121';
-                
-                let profitDisplay = document.querySelector('#profit-display');
-                if (!profitDisplay) {
-                    profitDisplay = document.createElement('div');
-                    profitDisplay.id = 'profit-display';
-                    profitDisplay.style.marginTop = '5px';
-                    profitDisplay.style.fontSize = '12px';
-                    if (sellPriceInput && sellPriceInput.parentElement) {
-                        sellPriceInput.parentElement.appendChild(profitDisplay);
-                    }
-                }
-                
-                profitDisplay.innerHTML = `<span style="color: ${profitColor};">💰 利润率: ${rate}% (毛利: ¥${profit.toFixed(2)})</span>`;
-            }
-        }
-        
-        if (costPriceInput && sellPriceInput) {
-            costPriceInput.addEventListener('input', updateProfitRate);
-            sellPriceInput.addEventListener('input', updateProfitRate);
-        }
     });
 </script>
 {% endblock %}

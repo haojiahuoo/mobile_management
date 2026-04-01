@@ -1,0 +1,23 @@
+{
+  // 🚫 关闭自动格式化（最关键）
+  "editor.formatOnSave": false,
+
+  // 👉 HTML 使用默认格式化器（避免 Prettier 乱搞）
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+
+  // 👉 Django 模板单独控制
+  "[django-html]": {
+    "editor.formatOnSave": false
+  },
+
+  // 🚫 禁用 Prettier 对 Django 模板的处理
+  "prettier.disableLanguages": ["django-html"],
+
+  "prettier.requireConfig": true,
+  // 👉 让 Django 模板识别为 django-html（非常关键）
+  "files.associations": {
+    "*.html": "django-html"
+  }
+}
