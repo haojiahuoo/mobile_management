@@ -196,11 +196,11 @@ JAZZMIN_SETTINGS = {
     
     "topmenu_links": [
         {"name": "首页", "url": "admin:index"},
-        {"name": "📦 采购管理", "url": "/admin/inventory/product/"},
+        {"name": "📦 采购管理", "url": "/admin/inventory/status/"},
         {"name": "💰 销售管理", "url": "/admin/inventory/sale/"},
         {"name": "🔧 维修管理", "url": "/admin/inventory/repair/"},
         {"name": "💳 财务管理", "url": "/admin/inventory/expense/"},
-        {"name": "📋 库存状态", "url": "/admin/inventory/status/"},
+        {"name": "📋 库存状态", "url": "/admin/inventory/product/"},
         {"name": "📊 经营历程", "url": "/admin/inventory/transaction/"},
     ],
     

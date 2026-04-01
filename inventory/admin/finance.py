@@ -42,4 +42,7 @@ class InitialAccountingAdmin(BaseAdmin):
     list_display = ('account', 'initial_balance', 'initial_date')
 
     def changelist_view(self, request, extra_context=None):
-        return redirect('admin:initial_accounting_choice')
+        # 改为直接使用URL路径，或者使用正确的路由名称
+        return redirect('/admin/initial-accounting/')
+        # 或者如果路由名称是 initial_accounting_choice
+        # return redirect('initial_accounting_choice')

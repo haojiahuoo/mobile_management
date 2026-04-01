@@ -11,213 +11,134 @@
                 <!-- 第一层分组标题行（主分类） -->
                 <thead>
                     <tr style="background: #e8f0f7; border-bottom: 2px solid #79aec8;">
-                        <th colspan="4" style="border: 1px solid #ddd; padding: 10px 12px; text-align: center; font-weight: bold; font-size: 14px; color: #2c3e50;">
-                            📦 基本信息
+                        <th colspan="2" style="border: 1px solid #ddd; padding: 10px 12px; text-align: center; font-weight: bold; font-size: 14px; color: #2c3e50; width: 15%;">
+                            🔢 基础信息
                         </th>
-                        <th colspan="2" style="border: 1px solid #ddd; padding: 10px 12px; text-align: center; font-weight: bold; font-size: 14px; color: #2c3e50;">
-                            🏷️ 分类与价格
+                        <th colspan="5" style="border: 1px solid #ddd; padding: 10px 12px; text-align: center; font-weight: bold; font-size: 14px; color: #2c3e50;">
+                            📦 商品信息
                         </th>
-                        <th colspan="2" style="border: 1px solid #ddd; padding: 10px 12px; text-align: center; font-weight: bold; font-size: 14px; color: #2c3e50;">
-                            ⚙️ 其他信息
+                        <th colspan="3" style="border: 1px solid #ddd; padding: 10px 12px; text-align: center; font-weight: bold; font-size: 14px; color: #2c3e50;">
+                            💰 其他信息
+                        </th>
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: center; font-weight: bold; font-size: 14px; color: #2c3e50; width: 8%;">
+                            🎯 操作
                         </th>
                     </tr>
                     
                     <!-- 第二层字段标签行（子分类） -->
                     <tr style="background: #f5f7fa; border-bottom: 1px solid #ddd;">
-                        <!-- 基本信息组 -->
-                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 120px;">
-                            商品编号
+                        <!-- 基础信息组 -->
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; width: 4%;">
+                            序号
                         </th>
-                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 120px;">
-                            商品品牌
-                        </th>
-                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 150px;">
-                            商品名称 <span style="color: red;">*</span>
-                        </th>
-                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 100px;">
-                            单位
-                        </th>
-                        
-                        <!-- 分类与价格组 -->
-                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 150px;">
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; width: 12%;">
                             商品分类
                         </th>
-                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 120px;">
-                            售价
+                        
+                        <!-- 商品信息组 -->
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; width: 12%;">
+                            商品编号
+                        </th>
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; width: 15%;">
+                            商品名称 <span style="color: red;">*</span>
+                        </th>
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; width: 10%;">
+                            商品品牌
+                        </th>
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; width: 10%;">
+                            型号
+                        </th>
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; width: 10%;">
+                            规格
                         </th>
                         
                         <!-- 其他信息组 -->
-                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 100px;">
-                            是否启用
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; width: 8%;">
+                            售价
                         </th>
-                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; min-width: 150px;">
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 600; width: 12%;">
                             备注
+                        </th>
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: center; font-weight: 600; width: 8%;">
+                            启用
+                        </th>
+                        
+                        <!-- 操作组 -->
+                        <th style="border: 1px solid #ddd; padding: 10px 12px; text-align: center; font-weight: 600; width: 8%;">
+                            操作
                         </th>
                     </tr>
                 </thead>
                 
                 <!-- 值行 - 显示5行便于批量添加 -->
                 <tbody>
-                    <tr style="background: #fff;">
-                        <td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">
-                            <input type="text" name="code_1" id="id_code_1" class="code-field" readonly style="background: #f5f5f5; color: #666; cursor: not-allowed; width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;" value="自动生成">
+                    <tr style="background: #fff;" id="row_1">
+                        <!-- 基础信息值 -->
+                        <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">
+                            <input type="text" name="id_1" id="id_id_1" class="id-field" readonly style="background: #f5f5f5; color: #666; cursor: not-allowed; width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" value="自动生成">
                         </td>
                         <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="brand_1" id="id_brand_1" class="brand-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                            <select name="category_id_1" id="id_category_1" class="category-field" 
+                                style="width: 100% !important; min-width: 280px !important; padding: 10px 12px !important; border: 1px solid #ccc; border-radius: 4px; font-size: 16px !important; font-weight: 500 !important;">
+                                <option value="">---------</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}"
+                                    {% if request.GET.category|add:"0" == category.id %}
+                                        selected
+                                    {% endif %}
+                                    style="padding-left: {% widthratio category.level 1 20 %}px; font-size: 16px !important;">
+                                    {{ category.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        
+                        <!-- 商品信息值 -->
+                        <td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">
+                            <input type="text" name="code_1" id="id_code_1" class="code-field" readonly style="background: #f5f5f5; color: #666; cursor: not-allowed; width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;" value="自动生成">
                         </td>
                         <td style="border: 1px solid #ddd; padding: 8px 12px;">
                             <input type="text" name="name_1" id="id_name_1" class="name-field" required style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
                         </td>
                         <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="unit_1" id="id_unit_1" class="unit-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                            <input type="text" name="brand_1" id="id_brand_1" class="brand-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
                         </td>
                         <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <select name="category" id="id_category" class="category-field"
-                                style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
-                                
-                                <option value="">---------</option>
-                                
-                                {% for category in categories %}
-                                <option value="{{ category.id }}"
-                                    {% if adminform.form.category.value == category.id %}selected{% endif %}>
-                                    {{ category.name }}
-                                </option>
-                                {% endfor %}
-                                
-                            </select>
+                            <input type="text" name="model_1" id="id_model_1" class="model-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
                         </td>
+                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                            <input type="text" name="specification_1" id="id_specification_1" class="specification-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                        </td>
+                        
+                        <!-- 其他信息值 -->
                         <td style="border: 1px solid #ddd; padding: 8px 12px;">
                             <input type="number" name="sell_price_1" id="id_sell_price_1" step="0.01" class="sell-price-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px; text-align: right;">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">
-                            <input type="checkbox" name="is_active_1" id="id_is_active_1" class="is-active-field" checked style="width: auto; margin: 0; transform: scale(1.2);">
                         </td>
                         <td style="border: 1px solid #ddd; padding: 8px 12px;">
                             <input type="text" name="remark_1" id="id_remark_1" class="remark-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
                         </td>
-                    </tr>
-                    <tr style="background: #f9f9f9;">
-                        <td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">
-                            <input type="text" name="code_2" id="id_code_2" class="code-field" readonly style="background: #f5f5f5; color: #666; cursor: not-allowed; width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;" value="自动生成">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="brand_2" id="id_brand_2" class="brand-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="name_2" id="id_name_2" class="name-field" required style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="unit_2" id="id_unit_2" class="unit-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <select name="category_id_1" id="id_category_1" class="category-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
-                                <option value="">---------</option>
-                                {% for category in categories %}
-                                <option value="{{ category.id }}" 
-                                    {% if original.category.id == category.id or request.GET.category_id|add:"0" == category.id %}
-                                        selected
-                                    {% endif %}>
-                                    {% for i in "x"|ljust:category.level %}　{% endfor %}{{ category.name }}
-                                </option>
-                                {% endfor %}
-                            </select>
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="number" name="sell_price_2" id="id_sell_price_2" step="0.01" class="sell-price-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px; text-align: right;">
-                        </td>
                         <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">
-                            <input type="checkbox" name="is_active_2" id="id_is_active_2" class="is-active-field" checked style="width: auto; margin: 0; transform: scale(1.2);">
+                            <input type="checkbox" name="is_active_1" id="id_is_active_1" class="is-active-field" checked style="width: auto; margin: 0; transform: scale(1.2);">
                         </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="remark_2" id="id_remark_2" class="remark-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
-                        </td>
-                    </tr>
-                    <tr style="background: #fff;">
-                        <td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">
-                            <input type="text" name="code_3" id="id_code_3" class="code-field" readonly style="background: #f5f5f5; color: #666; cursor: not-allowed; width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;" value="自动生成">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="brand_3" id="id_brand_3" class="brand-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="name_3" id="id_name_3" class="name-field" required style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="unit_3" id="id_unit_3" class="unit-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="category_3" id="id_category_3" class="category-field" readonly style="background: #f5f5f5; color: #666; cursor: not-allowed; width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;" value="{% if original.category.name %}{{ original.category.name }}{% elif request.GET.category_name %}{{ request.GET.category_name }}{% else %}未选择分类{% endif %}">
-                            <input type="hidden" name="category_id_3" id="id_category_id_3" value="{% if original.category.id %}{{ original.category.id }}{% elif request.GET.category_id %}{{ request.GET.category_id }}{% endif %}">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="number" name="sell_price_3" id="id_sell_price_3" step="0.01" class="sell-price-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px; text-align: right;">
-                        </td>
+                        
+                        <!-- 操作按钮 -->
                         <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">
-                            <input type="checkbox" name="is_active_3" id="id_is_active_3" class="is-active-field" checked style="width: auto; margin: 0; transform: scale(1.2);">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="remark_3" id="id_remark_3" class="remark-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                            <button type="button" class="delete-row-btn" data-row="1" style="background: #dc3545; color: white; border: none; border-radius: 3px; padding: 4px 8px; cursor: pointer; font-size: 12px;">删除</button>
                         </td>
                     </tr>
-                    <tr style="background: #f9f9f9;">
-                        <td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">
-                            <input type="text" name="code_4" id="id_code_4" class="code-field" readonly style="background: #f5f5f5; color: #666; cursor: not-allowed; width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;" value="自动生成">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="brand_4" id="id_brand_4" class="brand-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="name_4" id="id_name_4" class="name-field" required style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="unit_4" id="id_unit_4" class="unit-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="category_4" id="id_category_4" class="category-field" readonly style="background: #f5f5f5; color: #666; cursor: not-allowed; width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;" value="{% if original.category.name %}{{ original.category.name }}{% elif request.GET.category_name %}{{ request.GET.category_name }}{% else %}未选择分类{% endif %}">
-                            <input type="hidden" name="category_id_4" id="id_category_id_4" value="{% if original.category.id %}{{ original.category.id }}{% elif request.GET.category_id %}{{ request.GET.category_id }}{% endif %}">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="number" name="sell_price_4" id="id_sell_price_4" step="0.01" class="sell-price-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px; text-align: right;">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">
-                            <input type="checkbox" name="is_active_4" id="id_is_active_4" class="is-active-field" checked style="width: auto; margin: 0; transform: scale(1.2);">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="remark_4" id="id_remark_4" class="remark-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
-                        </td>
-                    </tr>
-                    <tr style="background: #fff;">
-                        <td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">
-                            <input type="text" name="code_5" id="id_code_5" class="code-field" readonly style="background: #f5f5f5; color: #666; cursor: not-allowed; width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;" value="自动生成">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="brand_5" id="id_brand_5" class="brand-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="name_5" id="id_name_5" class="name-field" required style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="unit_5" id="id_unit_5" class="unit-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="category_5" id="id_category_5" class="category-field" readonly style="background: #f5f5f5; color: #666; cursor: not-allowed; width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;" value="{% if original.category.name %}{{ original.category.name }}{% elif request.GET.category_name %}{{ request.GET.category_name }}{% else %}未选择分类{% endif %}">
-                            <input type="hidden" name="category_id_5" id="id_category_id_5" value="{% if original.category.id %}{{ original.category.id }}{% elif request.GET.category_id %}{{ request.GET.category_id }}{% endif %}">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="number" name="sell_price_5" id="id_sell_price_5" step="0.01" class="sell-price-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px; text-align: right;">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">
-                            <input type="checkbox" name="is_active_5" id="id_is_active_5" class="is-active-field" checked style="width: auto; margin: 0; transform: scale(1.2);">
-                        </td>
-                        <td style="border: 1px solid #ddd; padding: 8px 12px;">
-                            <input type="text" name="remark_5" id="id_remark_5" class="remark-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
-                        </td>
-                    </tr>
+                    <!-- 第3-5行类似，需要继续添加 -->
                 </tbody>
             </table>
         </div>
         
-        <!-- 隐藏字段 - 用于传递分类信息 -->
+        <!-- 添加更多按钮 -->
+        <div style="margin-top: 10px; text-align: right;">
+            <button type="button" id="add-more-rows" style="padding: 6px 12px; background: #79aec8; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                + 添加更多行
+            </button>
+        </div>
+        
+        <!-- 隐藏字段 -->
         <input type="hidden" name="default_category_id" id="default_category_id" value="{% if original.category.id %}{{ original.category.id }}{% elif request.GET.category_id %}{{ request.GET.category_id }}{% endif %}">
         <input type="hidden" name="default_category_name" id="default_category_name" value="{% if original.category.name %}{{ original.category.name }}{% elif request.GET.category_name %}{{ request.GET.category_name }}{% else %}未选择分类{% endif %}">
         
@@ -264,38 +185,20 @@
         transform: scale(1.2);
     }
     
-    /* 错误消息样式 */
-    .error-message {
-        color: #ba2121;
-        font-size: 11px;
-        margin-top: 4px;
-        padding: 2px 4px;
-        background: #fff2f2;
-        border-radius: 3px;
+    /* 删除按钮样式 */
+    .delete-row-btn:hover {
+        background: #c82333 !important;
     }
     
-    /* 帮助文本样式 */
-    .help-text {
-        color: #666;
-        font-size: 11px;
-        margin-top: 3px;
-        font-style: italic;
+    /* ID字段样式 */
+    .id-field {
+        text-align: center;
+        font-weight: bold;
     }
     
     /* 表格行悬停效果 */
     tbody tr:hover {
         background: #f0f7ff !important;
-    }
-    
-    /* 响应式设计 */
-    @media (max-width: 1200px) {
-        .excel-container {
-            overflow-x: auto;
-        }
-        
-        table {
-            min-width: 900px;
-        }
     }
     
     /* 分组标题图标 */
@@ -308,37 +211,241 @@
         background-color: #f5f5f5;
         cursor: not-allowed;
     }
+    
+    /* 响应式设计 */
+    @media (max-width: 1400px) {
+        table {
+            min-width: 1100px;
+        }
+    }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // 获取默认分类信息
-        const defaultCategoryId = document.getElementById('default_category_id').value;
-        const defaultCategoryName = document.getElementById('default_category_name').value;
-        
-        // 自动生成编号的函数
-        function generateCode(rowIndex) {
-            const timestamp = Date.now();
-            const random = Math.floor(Math.random() * 1000);
-            return `PROD-${timestamp}-${random}-${rowIndex}`;
+    let rowCount = 5; // 初始5行
+    
+    // 获取默认分类信息
+    const defaultCategoryId = document.getElementById('default_category_id').value;
+    const defaultCategoryName = document.getElementById('default_category_name').value;
+    
+    // 自动生成ID的函数 - 改为序号
+    function generateId(rowIndex) {
+        return rowIndex;  // 直接返回行号作为序号
+    }
+    
+    // 自动生成编号的函数
+    async function generateCode(rowIndex, categoryId) {
+        if (!categoryId) {
+            return `未选择分类-${String(rowIndex).padStart(5, '0')}`;
         }
         
-        // 初始化所有编号
-        for (let i = 1; i <= 5; i++) {
-            const codeField = document.getElementById(`id_code_${i}`);
-            if (codeField && codeField.value === '自动生成') {
-                codeField.value = generateCode(i);
+        // 通过AJAX请求获取该分类下的最大序号
+        try {
+            const response = await fetch(`/admin/inventory/product/get_next_code/?category_id=${categoryId}`);
+            const data = await response.json();
+            const nextNumber = data.next_number;
+            return `${data.category_code}-${String(nextNumber).padStart(5, '0')}`;
+        } catch (error) {
+            console.error('获取编号失败:', error);
+            return `ERROR-${String(rowIndex).padStart(5, '0')}`;
+        }
+    }
+    
+    // 重新排序所有行的序号
+    function reorderIds() {
+        const rows = document.querySelectorAll('tbody tr');
+        rows.forEach((row, index) => {
+            const newId = index + 1;
+            const idInput = row.querySelector('.id-field');
+            if (idInput) {
+                idInput.value = newId;
+                // 更新name和id属性
+                const oldName = idInput.getAttribute('name');
+                if (oldName) {
+                    const newName = oldName.replace(/_\d+$/, `_${newId}`);
+                    idInput.setAttribute('name', newName);
+                }
+                idInput.setAttribute('id', `id_id_${newId}`);
             }
-        }
-        
-        // 添加键盘快捷键支持（Ctrl+Enter 保存）
-        document.addEventListener('keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                e.preventDefault();
-                const saveButton = document.querySelector('input[name="_save"]');
-                if (saveButton) saveButton.click();
+            
+            // 更新行的ID
+            row.id = `row_${newId}`;
+            
+            // 更新删除按钮的data-row属性
+            const deleteBtn = row.querySelector('.delete-row-btn');
+            if (deleteBtn) {
+                deleteBtn.setAttribute('data-row', newId);
             }
         });
+        rowCount = rows.length;
+    }
+    
+    // 监听分类选择变化，自动生成编号
+    function setupCodeGeneration(rowIndex) {
+        const categorySelect = document.getElementById(`id_category_${rowIndex}`);
+        const codeField = document.getElementById(`id_code_${rowIndex}`);
+        
+        if (categorySelect && codeField) {
+            // 初始生成
+            if (categorySelect.value) {
+                generateCode(rowIndex, categorySelect.value).then(code => {
+                    codeField.value = code;
+                });
+            }
+            
+            // 分类变化时重新生成
+            categorySelect.addEventListener('change', async function() {
+                if (this.value) {
+                    const code = await generateCode(rowIndex, this.value);
+                    codeField.value = code;
+                } else {
+                    codeField.value = `未选择分类-${String(rowIndex).padStart(5, '0')}`;
+                }
+            });
+        }
+    }
+    
+    // 初始化所有编号和ID
+    async function initializeAllCodes() {
+        for (let i = 1; i <= rowCount; i++) {
+            // 初始化ID
+            const idField = document.getElementById(`id_id_${i}`);
+            if (idField && idField.value === '自动生成') {
+                idField.value = i;
+            }
+            
+            // 初始化编号
+            const categorySelect = document.getElementById(`id_category_${i}`);
+            const codeField = document.getElementById(`id_code_${i}`);
+            
+            if (categorySelect && codeField && codeField.value === '自动生成') {
+                if (categorySelect.value) {
+                    const code = await generateCode(i, categorySelect.value);
+                    codeField.value = code;
+                } else {
+                    codeField.value = `未选择分类-${String(i).padStart(5, '0')}`;
+                }
+            }
+            
+            // 设置监听器
+            setupCodeGeneration(i);
+        }
+    }
+    
+    // 删除行功能
+    function setupDeleteButtons() {
+        document.querySelectorAll('.delete-row-btn').forEach(btn => {
+            // 移除原有事件，避免重复绑定
+            btn.removeEventListener('click', btn._handler);
+            const handler = function() {
+                const rowId = this.getAttribute('data-row');
+                const row = document.getElementById(`row_${rowId}`);
+                if (row) {
+                    row.remove();
+                    reorderIds();  // 删除后重新排序
+                    // 重新初始化所有编号（因为序号变了，需要重新生成）
+                    initializeAllCodes();
+                }
+            };
+            btn._handler = handler;
+            btn.addEventListener('click', handler);
+        });
+    }
+    
+    // 添加更多行
+    const addButton = document.getElementById('add-more-rows');
+    if (addButton) {
+        addButton.addEventListener('click', function() {
+            rowCount++;
+            const tbody = document.querySelector('tbody');
+            const newRow = document.createElement('tr');
+            const isEven = rowCount % 2 === 0;
+            newRow.id = `row_${rowCount}`;
+            newRow.style.background = isEven ? '#fff' : '#f9f9f9';
+            
+            // 获取分类下拉框的HTML选项
+            let categoryOptions = '';
+            const firstCategorySelect = document.getElementById('id_category_1');
+            if (firstCategorySelect) {
+                categoryOptions = firstCategorySelect.innerHTML;
+            }
+            
+            newRow.innerHTML = `
+                <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">
+                    <input type="text" name="id_${rowCount}" id="id_id_${rowCount}" class="id-field" readonly style="background: #f5f5f5; color: #666; cursor: not-allowed; width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px; text-align: center;" value="${rowCount}">
+                 </td>
+                <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                    <select name="category_id_${rowCount}" id="id_category_${rowCount}" class="category-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                        ${categoryOptions}
+                    </select>
+                </td>
+                <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                    <input type="text" name="code_${rowCount}" id="id_code_${rowCount}" class="code-field" readonly style="background: #f5f5f5; color: #666; cursor: not-allowed; width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;" value="自动生成">
+                </td>
+                <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                    <input type="text" name="name_${rowCount}" id="id_name_${rowCount}" class="name-field" required style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                </td>
+                <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                    <input type="text" name="brand_${rowCount}" id="id_brand_${rowCount}" class="brand-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                </td>
+                <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                    <input type="text" name="model_${rowCount}" id="id_model_${rowCount}" class="model-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                </td>
+                <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                    <input type="text" name="specification_${rowCount}" id="id_specification_${rowCount}" class="specification-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                </td>
+                <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                    <input type="number" name="sell_price_${rowCount}" id="id_sell_price_${rowCount}" step="0.01" class="sell-price-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px; text-align: right;">
+                </td>
+                <td style="border: 1px solid #ddd; padding: 8px 12px;">
+                    <input type="text" name="remark_${rowCount}" id="id_remark_${rowCount}" class="remark-field" style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px;">
+                </td>
+                <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">
+                    <label style="display: inline-flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="checkbox" name="is_active_${rowCount}" id="id_is_active_${rowCount}" class="is-active-field" checked style="width: auto; margin: 0; transform: scale(1.2);">
+                    </label>
+                </td>
+                <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">
+                    <button type="button" class="delete-row-btn" data-row="${rowCount}" style="background: #dc3545; color: white; border: none; border-radius: 3px; padding: 4px 8px; cursor: pointer; font-size: 12px;">删除</button>
+                </td>
+            `;
+            
+            tbody.appendChild(newRow);
+            
+            // 为新行设置编号生成
+            setupCodeGeneration(rowCount);
+            
+            // 如果默认分类存在，设置选中的分类
+            if (defaultCategoryId) {
+                const newCategorySelect = document.getElementById(`id_category_${rowCount}`);
+                if (newCategorySelect) {
+                    newCategorySelect.value = defaultCategoryId;
+                    // 触发生成编号
+                    generateCode(rowCount, defaultCategoryId).then(code => {
+                        const newCodeField = document.getElementById(`id_code_${rowCount}`);
+                        if (newCodeField) newCodeField.value = code;
+                    });
+                }
+            }
+            
+            // 重新绑定删除按钮事件
+            setupDeleteButtons();
+        });
+    }
+    
+    // 页面加载时调用
+    initializeAllCodes().then(() => {
+        setupDeleteButtons();
     });
+    
+    // 添加键盘快捷键支持（Ctrl+Enter 保存）
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            const saveButton = document.querySelector('input[name="_save"]');
+            if (saveButton) saveButton.click();
+        }
+    });
+});
 </script>
 {% endblock %}

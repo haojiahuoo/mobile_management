@@ -8,6 +8,8 @@ from ..models import Product, ProductCategory, ProductAttribute, ProductAttribut
 from .base import BaseAdmin
 from ..models.core import ColorChoices  # 添加这一行
 from django.urls import path, reverse
+from django.http import JsonResponse
+
 # ================== SKU Inline ==================
 class ProductSKUInline(admin.TabularInline):
     """SKU 内联管理"""
@@ -22,7 +24,7 @@ class ProductSKUInline(admin.TabularInline):
         return 0
 
 
-# ================== 商品管理 ==================
+# ================== 库存状态管理 ==================
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     """商品管理"""
@@ -92,6 +94,7 @@ class ProductAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
+            path('get_next_code/', self.admin_site.admin_view(self.get_next_code), name='product-get-next-code'),
             path('<int:product_id>/generate_sku/', self.admin_site.admin_view(self.generate_sku_view), name='product-generate-sku'),
         ]
         return custom_urls + urls
@@ -166,6 +169,27 @@ class ProductAdmin(admin.ModelAdmin):
         updated = queryset.update(is_active=True)
         self.message_user(request, f'成功启用 {updated} 个商品')
     batch_set_active.short_description = '批量启用商品'
+    
+    # 添加这个方法
+    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
+        """传递分类数据到模板"""
+        
+        # 获取所有激活的分类（用于显示下拉框）
+        categories = ProductCategory.objects.filter(is_active=True).order_by('level', 'id')
+        context['categories'] = categories
+        
+        # 如果是新增页面且URL有category参数，传递当前选中的分类
+        if add:
+            category_id = request.GET.get('category')
+            if category_id:
+                try:
+                    default_category = ProductCategory.objects.get(id=category_id)
+                    context['default_category_id'] = category_id
+                    context['default_category_name'] = default_category.name
+                except ProductCategory.DoesNotExist:
+                    pass
+        
+        return super().render_change_form(request, context, add, change, form_url, obj)
 
     def get_changeform_initial_data(self, request):
         initial = super().get_changeform_initial_data(request)
@@ -184,7 +208,36 @@ class ProductAdmin(admin.ModelAdmin):
         
         return readonly
     
-# ================== 分类管理 ==================
+    def get_next_code(self, request):
+        """获取下一个商品编号"""
+        category_id = request.GET.get('category_id')
+        if category_id:
+            try:
+                category = ProductCategory.objects.get(id=category_id)
+                # 获取该分类下的最大编号
+                products = Product.objects.filter(category_id=category_id)
+                max_code = None
+                for product in products:
+                    if product.code and product.code.startswith(f"{category.code}-"):
+                        try:
+                            num = int(product.code.split('-')[-1])
+                            if max_code is None or num > max_code:
+                                max_code = num
+                        except:
+                            continue
+                
+                next_number = 1 if max_code is None else max_code + 1
+                return JsonResponse({
+                    'category_code': category.code,
+                    'next_number': next_number
+                })
+            except ProductCategory.DoesNotExist:
+                pass
+        
+        return JsonResponse({'category_code': 'ERROR', 'next_number': 1})
+    
+    
+# ================== 商品分类管理 ==================
 @admin.register(ProductCategory)
 class ProductCategoryAdmin(BaseAdmin):
     """商品分类管理"""
@@ -248,11 +301,11 @@ class ProductCategoryAdmin(BaseAdmin):
     # ========== 查询集处理 ==========
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        parent_id = request.GET.get('parent')
-        if parent_id:
-            qs = qs.filter(parent_id=parent_id)
-        else:
-            qs = qs.filter(parent__isnull=True)
+        # parent_id = request.GET.get('parent')
+        # if parent_id:
+        #     qs = qs.filter(parent_id=parent_id)
+        # else:
+        #     qs = qs.filter(parent__isnull=True)
         return qs
     
     # ========== 保存处理 ==========

@@ -7154,3 +7154,568 @@ Traceback (most recent call last):
     raise TemplateSyntaxError("Invalid filter: '%s'" % filter_name)
 django.template.exceptions.TemplateSyntaxError: Template: F:\github\mobile_management\templates\admin\inventory\product\change_form.html, Invalid filter: 'to'
 "GET /admin/inventory/product/add/?category=19 HTTP/1.1" 500 266963
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 18576
+"GET /static/vendor/bootstrap/js/bootstrap.bundle.min.js.map HTTP/1.1" 404 1955
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 18576
+"GET /static/vendor/bootstrap/js/bootstrap.bundle.min.js.map HTTP/1.1" 404 1955
+Internal Server Error: /admin/inventory/initialaccounting/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\admin\options.py", line 719, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\utils\decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\utils\decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\admin\sites.py", line 246, in inner
+    return view(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\admin\finance.py", line 45, in changelist_view
+    return redirect('admin:initial_accounting_choice')
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 51, in redirect
+    resolve_url(to, *args, **kwargs),
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 184, in resolve_url
+    return reverse(to, args=args, kwargs=kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'initial_accounting_choice' not found. 'initial_accounting_choice' is not a valid view function or pattern name.
+"GET /admin/inventory/initialaccounting/ HTTP/1.1" 500 129341
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 18428
+Internal Server Error: /admin/inventory/status/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\views.py", line 45, in inventory_status
+    return render(request, 'inventory/dashboard/stock_status.html', context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: inventory/dashboard/stock_status.html
+"GET /admin/inventory/status/ HTTP/1.1" 500 110413
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 18576
+"GET /static/vendor/bootstrap/js/bootstrap.bundle.min.js.map HTTP/1.1" 404 1955
+Internal Server Error: /admin/inventory/status/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\views.py", line 45, in inventory_status
+    return render(request, 'inventory/dashboard/stock_status.html', context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: inventory/dashboard/stock_status.html
+"GET /admin/inventory/status/ HTTP/1.1" 500 110413
+Internal Server Error: /admin/inventory/status/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\views.py", line 45, in inventory_status
+    return render(request, 'inventory/dashboard/stock_status.html', context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: inventory/dashboard/stock_status.html
+"GET /admin/inventory/status/ HTTP/1.1" 500 110413
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 18576
+"GET /static/vendor/bootstrap/js/bootstrap.bundle.min.js.map HTTP/1.1" 404 1955
+Internal Server Error: /admin/inventory/status/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\views.py", line 45, in inventory_status
+    return render(request, 'inventory/dashboard/stock_status.html', context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: inventory/dashboard/stock_status.html
+"GET /admin/inventory/status/ HTTP/1.1" 500 110413
+Internal Server Error: /admin/inventory/status/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\views.py", line 45, in inventory_status
+    return render(request, 'inventory/dashboard/stock_status.html', context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: inventory/dashboard/stock_status.html
+"GET /admin/inventory/status/ HTTP/1.1" 500 110551
+Internal Server Error: /admin/inventory/status/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\views.py", line 45, in inventory_status
+    return render(request, 'inventory/dashboard/stock_status.html', context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: inventory/dashboard/stock_status.html
+"GET /admin/inventory/status/ HTTP/1.1" 500 110551
+Internal Server Error: /admin/inventory/status/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\views.py", line 45, in inventory_status
+    return render(request, 'inventory/dashboard/stock_status.html', context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: inventory/dashboard/stock_status.html
+"GET /admin/inventory/status/ HTTP/1.1" 500 110550
+Internal Server Error: /admin/inventory/status/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\views.py", line 45, in inventory_status
+    return render(request, 'inventory/dashboard/stock_status.html', context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: inventory/dashboard/stock_status.html
+"GET /admin/inventory/status/ HTTP/1.1" 500 110413
+Internal Server Error: /admin/inventory/status/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\views.py", line 45, in inventory_status
+    return render(request, 'inventory/dashboard/stock_status.html', context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: inventory/dashboard/stock_status.html
+"GET /admin/inventory/status/ HTTP/1.1" 500 109713
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 18576
+"GET /static/vendor/bootstrap/js/bootstrap.bundle.min.js.map HTTP/1.1" 404 1955
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 18576
+"GET /static/vendor/bootstrap/js/bootstrap.bundle.min.js.map HTTP/1.1" 404 1955
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 18576
+"GET /static/vendor/bootstrap/js/bootstrap.bundle.min.js.map HTTP/1.1" 404 1955
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 18576
+"GET /static/vendor/bootstrap/js/bootstrap.bundle.min.js.map HTTP/1.1" 404 1955
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 18576
+"GET /static/vendor/bootstrap/js/bootstrap.bundle.min.js.map HTTP/1.1" 404 1955
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 18576
+"GET /static/vendor/bootstrap/js/bootstrap.bundle.min.js.map HTTP/1.1" 404 1955
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 18576
+"GET /static/vendor/bootstrap/js/bootstrap.bundle.min.js.map HTTP/1.1" 404 1955
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 18576
+"GET /static/vendor/bootstrap/js/bootstrap.bundle.min.js.map HTTP/1.1" 404 1955
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 18576
+"GET /static/vendor/bootstrap/js/bootstrap.bundle.min.js.map HTTP/1.1" 404 1955
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 18576
+"GET /static/vendor/bootstrap/js/bootstrap.bundle.min.js.map HTTP/1.1" 404 1955
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 18576
+"GET /static/vendor/bootstrap/js/bootstrap.bundle.min.js.map HTTP/1.1" 404 1955
+Internal Server Error: /admin/inventory/initialaccounting/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\admin\options.py", line 719, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\utils\decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\utils\decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\admin\sites.py", line 246, in inner
+    return view(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\admin\finance.py", line 45, in changelist_view
+    return redirect('admin:initial_accounting_choice')
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 51, in redirect
+    resolve_url(to, *args, **kwargs),
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 184, in resolve_url
+    return reverse(to, args=args, kwargs=kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'initial_accounting_choice' not found. 'initial_accounting_choice' is not a valid view function or pattern name.
+"GET /admin/inventory/initialaccounting/ HTTP/1.1" 500 129346
+Internal Server Error: /admin/inventory/status/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\views.py", line 45, in inventory_status
+    return render(request, 'inventory/dashboard/stock_status.html', context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: inventory/dashboard/stock_status.html
+"GET /admin/inventory/status/ HTTP/1.1" 500 109717
+Internal Server Error: /admin/inventory/status/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\views.py", line 45, in inventory_status
+    return render(request, 'inventory/dashboard/stock_status.html', context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: inventory/dashboard/stock_status.html
+"GET /admin/inventory/status/ HTTP/1.1" 500 109717
+Internal Server Error: /admin/inventory/initialaccounting/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\admin\options.py", line 719, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\utils\decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\utils\decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\admin\sites.py", line 246, in inner
+    return view(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\admin\finance.py", line 45, in changelist_view
+    return redirect('admin:initial_accounting_choice')
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 51, in redirect
+    resolve_url(to, *args, **kwargs),
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 184, in resolve_url
+    return reverse(to, args=args, kwargs=kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'initial_accounting_choice' not found. 'initial_accounting_choice' is not a valid view function or pattern name.
+"GET /admin/inventory/initialaccounting/ HTTP/1.1" 500 129345
+Internal Server Error: /admin/inventory/initialaccounting/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\admin\options.py", line 719, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\utils\decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\utils\decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\admin\sites.py", line 246, in inner
+    return view(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\admin\finance.py", line 45, in changelist_view
+    return redirect('admin:initial_accounting_choice')
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 51, in redirect
+    resolve_url(to, *args, **kwargs),
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 184, in resolve_url
+    return reverse(to, args=args, kwargs=kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'initial_accounting_choice' not found. 'initial_accounting_choice' is not a valid view function or pattern name.
+"GET /admin/inventory/initialaccounting/ HTTP/1.1" 500 129483
+Internal Server Error: /admin/inventory/initialaccounting/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\admin\options.py", line 719, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\utils\decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\utils\decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\admin\sites.py", line 246, in inner
+    return view(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\admin\finance.py", line 45, in changelist_view
+    return redirect('admin:initial_accounting_choice')
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 51, in redirect
+    resolve_url(to, *args, **kwargs),
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 184, in resolve_url
+    return reverse(to, args=args, kwargs=kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'initial_accounting_choice' not found. 'initial_accounting_choice' is not a valid view function or pattern name.
+"GET /admin/inventory/initialaccounting/ HTTP/1.1" 500 129483
+Internal Server Error: /admin/inventory/initialaccounting/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\admin\options.py", line 719, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\utils\decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\utils\decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\admin\sites.py", line 246, in inner
+    return view(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\admin\finance.py", line 45, in changelist_view
+    return redirect('admin:initial_accounting_choice')
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 51, in redirect
+    resolve_url(to, *args, **kwargs),
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 184, in resolve_url
+    return reverse(to, args=args, kwargs=kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'initial_accounting_choice' not found. 'initial_accounting_choice' is not a valid view function or pattern name.
+"GET /admin/inventory/initialaccounting/ HTTP/1.1" 500 129482
+Internal Server Error: /admin/inventory/initialaccounting/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\admin\options.py", line 719, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\utils\decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\utils\decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\admin\sites.py", line 246, in inner
+    return view(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\admin\finance.py", line 45, in changelist_view
+    return redirect('admin:initial_accounting_choice')
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 51, in redirect
+    resolve_url(to, *args, **kwargs),
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 184, in resolve_url
+    return reverse(to, args=args, kwargs=kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'initial_accounting_choice' not found. 'initial_accounting_choice' is not a valid view function or pattern name.
+"GET /admin/inventory/initialaccounting/ HTTP/1.1" 500 129482
+Internal Server Error: /admin/initial-accounting/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\views.py", line 53, in initial_accounting_choice
+    return render(request, 'admin/inventory/initial_accounting/choice.html')
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\test\utils.py", line 114, in instrumented_test_render
+    return self.nodelist.render(context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\test\utils.py", line 114, in instrumented_test_render
+    return self.nodelist.render(context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\test\utils.py", line 114, in instrumented_test_render
+    return self.nodelist.render(context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'initial_stock' not found. 'initial_stock' is not a valid view function or pattern name.
+"GET /admin/initial-accounting/ HTTP/1.1" 500 399725
+Internal Server Error: /admin/initial-stock/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\views.py", line 77, in initial_stock
+    return render(request, 'inventory/initial_accounting/stock.html', {'products': products})
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: inventory/initial_accounting/stock.html
+"GET /admin/initial-stock/ HTTP/1.1" 500 108161
+Internal Server Error: /admin/initial-stock/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\views.py", line 77, in initial_stock
+    return render(request, 'inventory/initial_accounting/stock.html', {'products': products})
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: inventory/initial_accounting/stock.html
+"GET /admin/initial-stock/ HTTP/1.1" 500 108299
+Internal Server Error: /admin/inventory/status/
+Traceback (most recent call last):
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "E:\Git_code\mobile_management\inventory\views.py", line 45, in inventory_status
+    return render(request, 'inventory/dashboard/stock_status.html', context)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\haoji\AppData\Roaming\Python\Python310\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: inventory/dashboard/stock_status.html
+"GET /admin/inventory/status/ HTTP/1.1" 500 109714

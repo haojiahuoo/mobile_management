@@ -50,7 +50,7 @@ def inventory_status(request):
 @staff_member_required
 def initial_accounting_choice(request):
     """初期建账选择页面"""
-    return render(request, 'inventory/initial_accounting/choice.html')
+    return render(request, 'admin/inventory/initial_accounting/choice.html')
 
 
 @staff_member_required
@@ -71,10 +71,12 @@ def initial_stock(request):
                 except Product.DoesNotExist:
                     pass
         messages.success(request, '库存数据已保存')
-        return redirect('admin:initial_stock')
+        # 修改这里：去掉 admin: 前缀
+        return redirect('initial_stock')
     
     products = Product.objects.all().select_related('category').order_by('category__name', 'name')
-    return render(request, 'inventory/initial_accounting/stock.html', {'products': products})
+    # 修改模板路径
+    return render(request, 'admin/inventory/initial_accounting/stock.html', {'products': products})
 
 
 @staff_member_required
