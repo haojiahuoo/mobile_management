@@ -1,0 +1,26 @@
+E:\Git_code\mobile_management\templates\
+│
+├── admin/                          # Django Admin 自定义模板
+│   ├── base_site.html              # 自定义Admin站点标题
+│   ├── login.html                  # 自定义登录页
+│   ├── index.html                  # 自定义Admin首页
+│   └── inventory/                  # inventory应用的Admin模板
+│       └── product/
+│           └── _deprecated/        # 备份的旧模板
+│               └── change_form.html.bak
+│
+├── frontend/                       # 前端页面模板
+│   ├── base.html                   # 基础模板（所有页面继承）
+│   ├── index.html                  # 首页
+│   └── product/
+│       ├── list.html               # 商品列表页
+│       ├── add.html                # 添加商品页
+│       └── batch-add.html          # 批量添加页
+│
+└── inventory/                      # inventory应用的模板
+    └── initial_accounting/
+        ├── choice.html             # 初期建账选择页
+        ├── stock.html              # 初期库存设置页
+        ├── receivable.html         # 初期应收应付页
+        ├── cash.html               # 初期现金存款页
+        └── finance.html            # 初期财务数据页

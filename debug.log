@@ -7719,3 +7719,41 @@ Traceback (most recent call last):
     raise TemplateDoesNotExist(template_name, chain=chain)
 django.template.exceptions.TemplateDoesNotExist: inventory/dashboard/stock_status.html
 "GET /admin/inventory/status/ HTTP/1.1" 500 109714
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 13291
+Internal Server Error: /admin/inventory/status/
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/opt/anaconda3/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/opt/anaconda3/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/haojiahuoo/GitCode/mobile_management/inventory/views.py", line 45, in inventory_status
+    return render(request, 'inventory/dashboard/stock_status.html', context)
+  File "/opt/anaconda3/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/opt/anaconda3/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/opt/anaconda3/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: inventory/dashboard/stock_status.html
+"GET /admin/inventory/status/ HTTP/1.1" 500 101445
+Internal Server Error: /admin/inventory/status/
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/opt/anaconda3/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/opt/anaconda3/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/haojiahuoo/GitCode/mobile_management/inventory/views.py", line 45, in inventory_status
+    return render(request, 'inventory/dashboard/stock_status.html', context)
+  File "/opt/anaconda3/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/opt/anaconda3/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/opt/anaconda3/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: inventory/dashboard/stock_status.html
+"GET /admin/inventory/status/ HTTP/1.1" 500 102082

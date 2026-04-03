@@ -1,0 +1,211 @@
+# ================== 商品管理 ==================
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    """商品管理"""
+    
+    # change_form_template = 'admin/inventory/product/change_form.html'
+    inlines = [ProductSKUInline]
+    
+    list_display = [
+        'id', 'code', 'name', 'brand', 'category',
+        'stock_display', 'cost_price', 'sell_price', 
+        'show_profit_rate', 'is_active', 'generate_sku_btn'
+    ]
+    list_filter = ['category', 'supplier', 'is_active', 'color', ('created_at', admin.DateFieldListFilter)]
+    search_fields = ['code', 'name', 'brand', 'remark']
+    list_per_page = 20
+    ordering = ['-created_at']
+    
+    fieldsets = None
+    readonly_fields = ['created_at', 'updated_at']
+    autocomplete_fields = ['category', 'supplier', 'account']
+    list_editable = ['sell_price', 'is_active']
+    save_on_top = True
+    
+    def stock_display(self, obj):
+        try:
+            stock = int(obj.stock)
+            if stock <= 0:
+                return mark_safe('<span style="color: #dc3545; font-weight: bold;">{} (缺货)</span>'.format(stock))
+            elif stock <= 10:
+                return mark_safe('<span style="color: #fd7e14; font-weight: bold;">{} (低库存)</span>'.format(stock))
+            return mark_safe('<span style="color: #28a745; font-weight: bold;">{}</span>'.format(stock))
+        except:
+            return str(obj.stock)
+    stock_display.short_description = '库存状态'
+    stock_display.admin_order_field = 'stock'
+    
+    def show_profit_rate(self, obj):
+        try:
+            if obj.sell_price and obj.cost_price and float(obj.cost_price) > 0:
+                cost = float(obj.cost_price)
+                sell = float(obj.sell_price)
+                rate = (sell - cost) / cost * 100
+                
+                if rate > 30:
+                    color, icon = '#28a745', '📈'
+                elif rate > 10:
+                    color, icon = '#17a2b8', '📊'
+                elif rate > 0:
+                    color, icon = '#ffc107', '📉'
+                else:
+                    color, icon = '#dc3545', '⚠️'
+                
+                return mark_safe('<span style="color: {}; font-weight: bold;">{} {:.1f}%</span>'.format(color, icon, rate))
+        except:
+            pass
+        return "-"
+    show_profit_rate.short_description = '利润率'
+    show_profit_rate.admin_order_field = 'sell_price'
+    
+    def generate_sku_btn(self, obj):
+        return mark_safe(
+            '<a class="button" href="/admin/inventory/product/{}/generate_sku/" '
+            'style="background: #79aec8; color: white; padding: 4px 8px; border-radius: 3px; text-decoration: none;">⚙️ 生成SKU</a>'.format(obj.id)
+        )
+    generate_sku_btn.short_description = 'SKU操作'
+    
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('get_next_code/', self.admin_site.admin_view(self.get_next_code), name='product-get-next-code'),
+            path('<int:product_id>/generate_sku/', self.admin_site.admin_view(self.generate_sku_view), name='product-generate-sku'),
+        ]
+        return custom_urls + urls
+    
+    def generate_sku_view(self, request, product_id):
+        product_obj = Product.objects.get(id=product_id)
+        attributes = {"颜色": ["黑色", "白色"], "容量": ["128G", "256G"]}
+        ProductSKU.objects.filter(product=product_obj).delete()
+        skus = self.generate_sku(product_obj, attributes)
+        ProductSKU.objects.bulk_create(skus)
+        self.message_user(request, f'成功生成 {len(skus)} 个SKU')
+        return redirect(f"/admin/inventory/product/{product_id}/change/")
+    
+    def generate_sku(self, product_obj, attributes_dict):
+        keys = list(attributes_dict.keys())
+        values = list(attributes_dict.values())
+        all_combinations = list(cartesian_product(*values))
+        skus = []
+        for combo in all_combinations:
+            attr_combo = dict(zip(keys, combo))
+            sku_code = f"{product_obj.code}-{'-'.join([str(v)[:2] for v in combo])}"[:50]
+            skus.append(ProductSKU(
+                product=product_obj,
+                attributes=attr_combo,
+                code=sku_code,
+                cost_price=product_obj.cost_price,
+                sell_price=product_obj.sell_price,
+                stock=0
+            ))
+        return skus
+    
+    def get_changeform_initial_data(self, request):
+        initial = super().get_changeform_initial_data(request)
+        category_id = request.GET.get('category')
+        if category_id:
+            initial['category'] = category_id
+        return initial
+    
+    def save_model(self, request, obj, form, change):
+        if not change:
+            self.message_user(request, f'成功添加商品：{obj.name}', level='SUCCESS')
+        else:
+            self.message_user(request, f'成功更新商品：{obj.name}', level='SUCCESS')
+        
+        if obj.category:
+            if not obj.brand:
+                obj.brand = obj.category.brand
+            if not obj.specification:
+                obj.specification = obj.category.specification
+                
+        super().save_model(request, obj, form, change)
+    
+    actions = ['batch_generate_sku', 'batch_update_stock', 'batch_set_active']
+    
+    def batch_generate_sku(self, request, queryset):
+        for product in queryset:
+            attributes = {"颜色": ["黑色", "白色"], "容量": ["128G", "256G"]}
+            ProductSKU.objects.filter(product=product).delete()
+            skus = self.generate_sku(product, attributes)
+            ProductSKU.objects.bulk_create(skus)
+        self.message_user(request, f'成功为 {queryset.count()} 个商品生成SKU')
+    batch_generate_sku.short_description = '批量生成SKU'
+    
+    def batch_update_stock(self, request, queryset):
+        for product in queryset:
+            product.stock += 10
+            product.save()
+        self.message_user(request, f'成功为 {queryset.count()} 个商品增加10个库存')
+    batch_update_stock.short_description = '批量增加10个库存'
+    
+    def batch_set_active(self, request, queryset):
+        updated = queryset.update(is_active=True)
+        self.message_user(request, f'成功启用 {updated} 个商品')
+    batch_set_active.short_description = '批量启用商品'
+    
+    # 添加这个方法
+    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
+        """传递分类数据到模板"""
+        
+        # 获取所有激活的分类（用于显示下拉框）
+        categories = ProductCategory.objects.filter(is_active=True).order_by('level', 'id')
+        context['categories'] = categories
+        
+        # 如果是新增页面且URL有category参数，传递当前选中的分类
+        if add:
+            category_id = request.GET.get('category')
+            if category_id:
+                try:
+                    default_category = ProductCategory.objects.get(id=category_id)
+                    context['default_category_id'] = category_id
+                    context['default_category_name'] = default_category.name
+                except ProductCategory.DoesNotExist:
+                    pass
+        
+        return super().render_change_form(request, context, add, change, form_url, obj)
+
+    def get_changeform_initial_data(self, request):
+        initial = super().get_changeform_initial_data(request)
+        
+        category_id = request.GET.get('category')
+        if category_id:
+            initial['category'] = category_id
+        
+        return initial
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly = list(super().get_readonly_fields(request, obj))
+        
+        if request.GET.get('category'):
+            readonly.append('category')
+        
+        return readonly
+    
+    def get_next_code(self, request):
+        """获取下一个商品编号"""
+        category_id = request.GET.get('category_id')
+        if category_id:
+            try:
+                category = ProductCategory.objects.get(id=category_id)
+                # 获取该分类下的最大编号
+                products = Product.objects.filter(category_id=category_id)
+                max_code = None
+                for product in products:
+                    if product.code and product.code.startswith(f"{category.code}-"):
+                        try:
+                            num = int(product.code.split('-')[-1])
+                            if max_code is None or num > max_code:
+                                max_code = num
+                        except:
+                            continue
+                
+                next_number = 1 if max_code is None else max_code + 1
+                return JsonResponse({
+                    'category_code': category.code,
+                    'next_number': next_number
+                })
+            except ProductCategory.DoesNotExist:
+                pass
+        
+        return JsonResponse({'category_code': 'ERROR', 'next_number': 1})

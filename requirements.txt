@@ -1,5 +1,5 @@
 # 核心依赖
-Django==5.2.12
+Django==4.2
 django-jazzmin==3.0.0
 
 # 可选开发工具
@@ -8,3 +8,4 @@ django-debug-toolbar==4.0.0
 # 数据库驱动（如果需要）
 # psycopg2-binary==2.9.0  # PostgreSQL
 # mysqlclient==2.2.0      # MySQL
+djangorestframework==3.14.0
