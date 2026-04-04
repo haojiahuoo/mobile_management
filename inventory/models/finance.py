@@ -47,14 +47,24 @@ class IncomeType(models.Model):
     is_active = models.BooleanField(default=True, verbose_name="是否启用")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
 
+    def get_full_path(self):
+        """获取完整路径"""
+        path_parts = []
+        category = self
+        while category:
+            path_parts.insert(0, category.name)
+            category = category.parent
+        return ' / '.join(path_parts)
+    
+    def __str__(self):
+        """显示完整路径"""
+        return self.get_full_path()  # ✅ 只保留这一个
+    
     class Meta:
         db_table = 'inventory_income_type'
         verbose_name = "收入类型"
         verbose_name_plural = "收入类型列表"
         ordering = ['sort_order', 'id']
-
-    def __str__(self):
-        return self.name
 
 
 class ExpenseType(models.Model):
@@ -67,11 +77,23 @@ class ExpenseType(models.Model):
     is_active = models.BooleanField(default=True, verbose_name="是否启用")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
 
+    def get_full_path(self):
+        """获取完整路径"""
+        path_parts = []
+        category = self
+        while category:
+            path_parts.insert(0, category.name)
+            category = category.parent
+        return ' / '.join(path_parts)
+    
+    def __str__(self):
+        """显示完整路径"""
+        return self.get_full_path()  # ✅ 只保留这一个
+    
     class Meta:
         db_table = 'inventory_expense_type'
         verbose_name = "费用类型"
         verbose_name_plural = "费用类型列表"
         ordering = ['sort_order', 'id']
 
-    def __str__(self):
-        return self.name
+  

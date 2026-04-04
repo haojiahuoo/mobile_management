@@ -24,3 +24,13 @@ E:\Git_code\mobile_management\templates\
         ├── receivable.html         # 初期应收应付页
         ├── cash.html               # 初期现金存款页
         └── finance.html            # 初期财务数据页
+
+
+inventory/admin/
+├── __init__.py
+├── base.py
+├── core.py          # ProductAdmin 包含初期建账方法
+├── finance.py
+├── party.py
+├── site.py
+└── transaction.py

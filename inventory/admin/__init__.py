@@ -7,6 +7,12 @@ from .transaction import StockInAdmin, SaleAdmin, RepairAdmin, RepairItemAdmin, 
 from .party import SupplierAdmin, StoreAdmin, StaffAdmin
 from .finance import AccountAdmin, TransactionAdmin, IncomeTypeAdmin, ExpenseTypeAdmin, InitialAccountingAdmin
 from .site import MyAdminSite, admin_site
+from .purchase import (
+    PurchaseOrderAdmin, PurchaseOrderItemInline,
+    PurchaseReceiptAdmin, PurchaseReceiptItemInline,
+    PurchaseReturnAdmin, PurchaseReturnItemInline
+)
+from .stock import StockAdmin, StockRecordAdmin, StockCheckAdmin, StockTransferAdmin
 
 __all__ = [
     'BaseAdmin', 'fmt_money', 'fmt_status', 'fmt_stock',
@@ -16,5 +22,9 @@ __all__ = [
     'SupplierAdmin', 'StoreAdmin', 'StaffAdmin',
     'AccountAdmin', 'TransactionAdmin', 'IncomeTypeAdmin', 'ExpenseTypeAdmin',
     'InitialAccountingAdmin',
+    'PurchaseOrderAdmin', 'PurchaseOrderItemInline',
+    'PurchaseReceiptAdmin', 'PurchaseReceiptItemInline',
+    'PurchaseReturnAdmin', 'PurchaseReturnItemInline',
+    'StockAdmin', 'StockRecordAdmin', 'StockCheckAdmin', 'StockTransferAdmin',
     'MyAdminSite', 'admin_site',
 ]

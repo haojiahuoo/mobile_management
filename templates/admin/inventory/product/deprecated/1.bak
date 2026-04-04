@@ -1,0 +1,337 @@
+@admin.register(ProductCategory)
+class ProductCategoryAdmin(BaseAdmin):
+    """商品分类管理"""
+    
+    # ========== 列表页显示字段 ==========
+    list_display = (
+        'id', 'code', 'name',
+        'brand_display',      # 品牌（自定义显示）
+        'specification_display',  # 规格
+        'model_display',      # 型号
+        'retail_price_display',   # 零售价
+        'remark_display',     # 备注
+        'edit_button'         # 编辑按钮
+    )
+    
+    list_display_links = None                           # 禁用默认的链接
+    # list_filter = ('parent', 'is_active', 'level')    # 右侧筛选器
+    search_fields = ['name', 'code', 'brand', 'model']  # 可搜索字段
+    list_editable = ()            # 不可直接编辑
+    list_per_page = 25            # 每页显示25条
+    ordering = ['level', 'id']    # 按层级和ID排序
+    
+    # ========== 列表页只读显示方法 ==========
+    def brand_display(self, obj):
+        return obj.brand if obj.brand else '-'
+    brand_display.short_description = '品牌'
+    
+    def specification_display(self, obj):
+        return obj.specification if obj.specification else '-'
+    specification_display.short_description = '规格'
+    
+    def model_display(self, obj):
+        return obj.model if obj.model else '-'
+    model_display.short_description = '型号'
+    
+    def retail_price_display(self, obj):
+        if obj.retail_price:
+            return f"¥{obj.retail_price}"
+        return '-'
+    retail_price_display.short_description = '零售价'
+    
+    def remark_display(self, obj):
+        if obj.remark:
+            return obj.remark[:10] + ('...' if len(obj.remark) > 10 else '')
+        return '-'
+    remark_display.short_description = '商品备注'
+    
+    # ========== 编辑按钮 ==========
+    def edit_button(self, obj):
+        """编辑按钮"""
+        from django.urls import reverse
+        return mark_safe(
+            '<a href="{}" class="edit-link" style="display: inline-block; background: #79aec8; color: white; padding: 4px 10px; text-decoration: none; border-radius: 3px; font-size: 12px;">'
+            '✏️ 编辑'
+            '</a>'.format(
+                reverse('admin:inventory_productcategory_change', args=[obj.id])
+            )
+        )
+    edit_button.short_description = '操作'
+    
+    # ========== 查询集处理 ==========
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        parent_id = request.GET.get('parent')
+        if parent_id:
+            qs = qs.filter(parent_id=parent_id)
+        else:
+            qs = qs.filter(parent__isnull=True)
+        return qs
+    
+    # ========== 保存处理 ==========
+    def save_model(self, request, obj, form, change):
+        if not change:
+            if obj.parent:
+                obj.level = obj.parent.level + 1
+            else:
+                obj.level = 1
+        
+        if not obj.code:
+            if obj.parent:
+                siblings = ProductCategory.objects.filter(parent=obj.parent).exclude(id=obj.id)
+                max_code = siblings.order_by('-code').first()
+                if max_code and max_code.code:
+                    last_num = int(max_code.code[-4:])
+                    obj.code = f"{obj.parent.code}{(last_num + 1):04d}"
+                else:
+                    obj.code = f"{obj.parent.code}0001"
+            else:
+                siblings = ProductCategory.objects.filter(parent__isnull=True).exclude(id=obj.id)
+                max_code = siblings.order_by('-code').first()
+                if max_code and max_code.code:
+                    last_num = int(max_code.code)
+                    obj.code = f"{(last_num + 1):04d}"
+                else:
+                    obj.code = "0001"
+
+        super().save_model(request, obj, form, change)
+    
+    # ========== 表单页配置 ==========
+    fieldsets = (
+        ('分类信息', {
+            #name(名称)、parent(父级分类)、is_active(是否启用)
+            'fields': ('name', 'parent', 'is_active'), 
+        }),
+        ('商品信息', {
+                        # 品牌、      规格、        型号、      零售价、       备注
+            'fields': ('brand', 'specification', 'model', 'retail_price', 'remark'),
+            'classes': ('collapse',),   # 这个分组默认折叠，点击才展开（适用于非核心信息）
+            'description': '这些信息将作为该分类下新商品的默认值'
+        }),
+    )
+    '''
+    这些字段在编辑页面只能看不能改，通常用于：
+        code：系统自动生成的编码
+        level：自动计算的层级
+        created_at：创建时间戳（不可修改）
+    '''
+    readonly_fields = ['code', 'level', 'created_at']
+    
+    # ========== 树形结构构建方法 ==========
+    def _build_tree_html(self, categories, parent_id=None, level=0, expand_ids=None):
+        """构建可折叠的树形结构HTML"""
+        if expand_ids is None:
+            expand_ids = []
+        
+        html = ''
+        siblings = [cat for cat in categories if cat.parent_id == parent_id]
+        
+        for i, cat in enumerate(siblings):
+            is_last = (i == len(siblings) - 1)
+            children = categories.filter(parent_id=cat.id)
+            has_children = children.exists()
+            
+            # 构建前缀
+            prefix = ''
+            if level > 0:
+                prefix = ' ' * (level - 1)
+                if is_last:
+                    prefix += '└'
+                else:
+                    prefix += '├'
+            
+            # 判断是否默认展开
+            is_expanded = cat.id in expand_ids
+            display_style = 'block' if is_expanded else 'none'
+            toggle_icon = '▼' if is_expanded else '▶'
+            
+            # 高亮当前选中的分类
+            current_parent = self.request.GET.get('parent')
+            is_active = str(cat.id) == current_parent
+            
+            # 文件夹图标
+            folder_icon = '📁' if has_children else '📄'
+            
+            html += f'''
+            <div class="tree-node" style="margin: 2px 0;">
+                <div class="tree-item" style="white-space: nowrap; 
+                    background: {is_active and '#e9ecef' or 'transparent'};
+                    font-weight: {is_active and 'bold' or 'normal'};">
+                    <span class="tree-prefix" style="color: #6c757d;">{prefix}</span>
+                    <span class="tree-folder-icon">{folder_icon}</span>
+                    <a href="?parent={cat.id}" data-id="{cat.id}" 
+                    data-has-children="{str(has_children).lower()}"
+                    class="tree-link {'has-children' if has_children else 'no-children'}"
+                    style="text-decoration: none; color: {is_active and '#0d6efd' or '#2c3e50'};">
+                        {cat.name}
+                    </a>
+                    {f'<span class="tree-toggle" data-id="{cat.id}" style="cursor: pointer; margin-left: 5px; color: #6c757d;">{toggle_icon}</span>' if has_children else ''}
+                </div>
+                <div class="tree-children" id="children_{cat.id}" style="display: {display_style}; margin-left: 20px;">
+                    {self._build_tree_html(categories, cat.id, level + 1, expand_ids) if has_children else ''}
+                </div>
+            </div>
+            '''
+        
+        return html
+    
+    def _get_category_path(self, category):
+        """获取分类的完整路径"""
+        path = []
+        current = category
+        while current:
+            path.insert(0, current.name)
+            current = current.parent
+        return ' > '.join(path)
+    
+    # ========== 主视图 ==========
+    def changelist_view(self, request, extra_context=None):
+        """列表页视图 - 添加树形导航"""
+        
+        extra_context = extra_context or {}
+        self.request = request
+        
+        # 获取需要展开的所有父级ID
+        def _get_expand_ids(category):
+            ids = []
+            current = category
+            while current:
+                ids.append(current.id)
+                current = current.parent
+            return ids
+        
+        # 获取所有分类
+        all_categories = ProductCategory.objects.filter(is_active=True).order_by('level', 'id')
+        
+        # 获取当前选中分类的完整路径
+        parent_id = request.GET.get('parent')
+        current_path = ''
+        expand_ids = []
+        
+        if parent_id:
+            try:
+                current = ProductCategory.objects.get(id=parent_id)
+                current_path = self._get_category_path(current)
+                expand_ids = _get_expand_ids(current)
+            except ProductCategory.DoesNotExist:
+                pass
+        
+        # 构建树形结构（传入 expand_ids）
+        category_tree = self._build_tree_html(all_categories, expand_ids=expand_ids)
+        
+        # 传递给模板
+        extra_context['expand_ids'] = expand_ids
+        extra_context['category_tree'] = mark_safe(category_tree)
+        extra_context['current_path'] = current_path
+        extra_context['custom_js'] = self._get_custom_js()
+        
+        return super().changelist_view(request, extra_context=extra_context)
+    
+    # ========== JavaScript ==========
+    def _get_custom_js(self):
+        return '''
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 加载保存的展开状态
+            function loadExpandedState() {
+                const expanded = localStorage.getItem('category_tree_expanded');
+                if (expanded) {
+                    const expandedIds = JSON.parse(expanded);
+                    expandedIds.forEach(id => {
+                        const childrenDiv = document.getElementById('children_' + id);
+                        const toggleSpan = document.querySelector(`.tree-toggle[data-id="${id}"]`);
+                        if (childrenDiv && toggleSpan) {
+                            childrenDiv.style.display = 'block';
+                            toggleSpan.textContent = '▼';
+                        }
+                    });
+                }
+            }
+            
+            document.querySelectorAll('.tree-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const hasChildren = this.getAttribute('data-has-children') === 'true';
+                    
+                    if (!hasChildren) {
+                        e.preventDefault();  // 🚫 阻止跳转
+                    }
+                });
+            });
+
+            // 保存展开状态
+            function saveExpandedState() {
+                const expandedIds = [];
+                document.querySelectorAll('.tree-children').forEach(children => {
+                    if (children.style.display === 'block') {
+                        const id = children.id.replace('children_', '');
+                        expandedIds.push(id);
+                    }
+                });
+                localStorage.setItem('category_tree_expanded', JSON.stringify(expandedIds));
+            }
+            
+            // 绑定折叠/展开事件
+            document.querySelectorAll('.tree-toggle').forEach(toggle => {
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const categoryId = this.getAttribute('data-id');
+                    const childrenDiv = document.getElementById('children_' + categoryId);
+                    
+                    if (childrenDiv) {
+                        if (childrenDiv.style.display === 'none' || !childrenDiv.style.display) {
+                            childrenDiv.style.display = 'block';
+                            this.textContent = '▼';
+                        } else {
+                            childrenDiv.style.display = 'none';
+                            this.textContent = '▶';
+                        }
+                    }
+                });
+            });
+
+            document.querySelectorAll('.tree-item a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // 不阻止跳转
+                });
+            });
+
+            // 为右侧列表添加双击事件
+            const rows = document.querySelectorAll('#result_list tbody tr');
+            rows.forEach(row => {
+                row.style.cursor = 'pointer';
+                row.addEventListener('dblclick', function(e) {
+                    if (e.target.tagName === 'A' || e.target.closest('.edit-link')) {
+                        return;
+                    }
+                    
+                    const firstCell = this.querySelector('td:first-child');
+                    if (!firstCell) return;
+                    
+                    let categoryId = firstCell.textContent.trim();
+                    const idInput = this.querySelector('input[name="_selected_action"]');
+                    if (idInput) {
+                        categoryId = idInput.value;
+                    }
+                    
+                    if (categoryId) {
+                        const hasChildren = this.querySelector('.button') !== null;
+                        if (hasChildren) {
+                            window.location.href = '?parent=' + categoryId;
+                        } else {
+                            window.location.href = '/admin/inventory/product/add/?category=' + categoryId;
+                        }
+                    }
+                });
+            });
+            
+            // 自动滚动到当前选中的分类
+            const activeLink = document.querySelector('.tree-item a[style*="font-weight: bold"]');
+            if (activeLink) {
+                activeLink.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+        </script>
+        '''
+     

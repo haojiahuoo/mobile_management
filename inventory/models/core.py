@@ -4,32 +4,9 @@ import uuid
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
+from ..choices import ColorChoices
+from ..validators import validate_color_hex
 
-
-# ================== 颜色验证 ==================
-def validate_color_hex(value: str) -> None:
-    """验证颜色代码格式"""
-    if value and not re.match(r'^#(?:[0-9a-fA-F]{3}){1,2}$', value):
-        raise ValidationError('颜色代码格式不正确，应为 #RRGGBB 或 #RGB 格式')
-
-
-class ColorChoices(models.TextChoices):
-    """颜色选项枚举类"""
-    NONE = '', '无'
-    BLACK = 'black', '黑色'
-    WHITE = 'white', '白色'
-    RED = 'red', '红色'
-    BLUE = 'blue', '蓝色'
-    GREEN = 'green', '绿色'
-    YELLOW = 'yellow', '黄色'
-    PURPLE = 'purple', '紫色'
-    PINK = 'pink', '粉色'
-    GOLD = 'gold', '金色'
-    SILVER = 'silver', '银色'
-    GRAY = 'gray', '灰色'
-    ORANGE = 'orange', '橙色'
-    BROWN = 'brown', '棕色'
-    CUSTOM = 'custom', '其他'
 
 
 class ProductCategory(models.Model):
@@ -54,18 +31,24 @@ class ProductCategory(models.Model):
     )
     remark = models.TextField(null=True, blank=True, verbose_name="商品备注")
     
-    # 标记是否为最终分类（即可以添加商品）
-    is_leaf_category = models.BooleanField(default=False, verbose_name="这是一个分类")
-
+    def get_full_path(self):
+        """获取完整路径"""
+        path_parts = []
+        category = self
+        while category:
+            path_parts.insert(0, category.name)
+            category = category.parent
+        return ' / '.join(path_parts)
+    
+    def __str__(self):
+        """在下拉框中显示完整路径"""
+        return self.get_full_path()  # ✅ 只保留这一个
+    
     class Meta:
         db_table = 'inventory_product_category'
         verbose_name = "商品分类"
         verbose_name_plural = "商品分类列表"
         ordering = ['level', 'sort_order', 'id']
-
-    def __str__(self):
-        """只返回分类名称，不显示父级"""
-        return self.name  # 只返回名称，不显示父级路径
 
     def save(self, *args, **kwargs):
         """保存时自动生成编码"""
@@ -76,22 +59,19 @@ class ProductCategory(models.Model):
     def _generate_code(self):
         """自动生成分类编码"""
         if self.parent:
-            # 子分类：父级编码 + 4位序号
             siblings = ProductCategory.objects.filter(parent=self.parent).exclude(id=self.id)
             last_code = siblings.order_by('-code').first()
             if last_code and last_code.code:
-                # 提取最后4位
                 last_num = int(last_code.code[-4:])
                 new_num = last_num + 1
                 return f"{self.parent.code}{new_num:04d}"
             else:
                 return f"{self.parent.code}0001"
         else:
-            # 顶级分类：4位序号
             siblings = ProductCategory.objects.filter(parent__isnull=True).exclude(id=self.id)
             last_code = siblings.order_by('-code').first()
             if last_code and last_code.code:
-                last_num = int(last_code.code[-4:])
+                last_num = int(last_code.code)
                 new_num = last_num + 1
                 return f"{new_num:04d}"
             else:
@@ -112,6 +92,8 @@ class ProductCategory(models.Model):
     @property
     def productcategory_set(self):
         return self.children
+    
+    
     
 # ================== 商品 ==================
 class Product(models.Model):
@@ -150,13 +132,26 @@ class Product(models.Model):
     )
     unit = models.CharField(max_length=20, default="个", verbose_name="单位")
     stock = models.IntegerField(default=0, verbose_name="库存数量", db_index=True)
-    cost_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="成本价")
-    sell_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name="售价")
     account = models.ForeignKey(
         'Account', on_delete=models.SET_NULL,
         null=True, blank=True, verbose_name="关联账户",
         db_index=True, related_name='products'
     )
+    cost_price = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        default=0,  # ✅ 添加默认值
+        verbose_name="成本价"
+    )
+    sell_price = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        null=True, 
+        blank=True, 
+        default=0,  # ✅ 添加默认值
+        verbose_name="售价"
+    )
+    
     remark = models.TextField(null=True, blank=True, verbose_name="备注")
     is_active = models.BooleanField(default=True, verbose_name="是否启用", db_index=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间", db_index=True)
@@ -173,9 +168,24 @@ class Product(models.Model):
         ]
 
     def __str__(self):
+        """显示商品：编号 + 名称 + 完整分类路径 + 颜色"""
         color_part = f" [{self.get_color_display()}]" if self.color else ""
-        brand_part = f"{self.brand} " if self.brand else ""
-        return f"[{self.code}] {brand_part}{self.name}{color_part}"
+        
+        # 获取完整分类路径
+        if self.category:
+            if hasattr(self.category, 'get_full_path'):
+                category_path = self.category.get_full_path()
+            else:
+                # 手动构建分类路径
+                path_parts = []
+                cat = self.category
+                while cat:
+                    path_parts.insert(0, cat.name)
+                    cat = cat.parent
+                category_path = ' / '.join(path_parts)
+            return f"[{self.code}] {self.name} ({category_path}){color_part}"
+        
+        return f"[{self.code}] {self.name}{color_part}"
 
     def get_color_display_value(self):
         """获取颜色显示值（用于admin显示）"""
@@ -229,6 +239,13 @@ class Product(models.Model):
 
     def clean(self):
         super().clean()
+        
+        # 确保数值字段有值
+        if self.cost_price is None:
+            self.cost_price = 0
+        if self.sell_price is None:
+            self.sell_price = 0
+            
         if self.sell_price is not None and self.sell_price < self.cost_price:
             raise ValidationError({'sell_price': '售价不能低于成本价'})
         if self.stock < 0:
@@ -237,6 +254,12 @@ class Product(models.Model):
             raise ValidationError({'color': '选择颜色后才可以填写颜色代码'})
 
     def save(self, *args, **kwargs):
+        # 设置默认值
+        if self.cost_price is None:
+            self.cost_price = 0
+        if self.sell_price is None:
+            self.sell_price = 0
+            
         if not self.code:
             self.code = self.generate_code()
         self.full_clean()

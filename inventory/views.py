@@ -4,7 +4,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import (
-    Product, Supplier, Account, InitialAccounting, ProductCategory
+    Product, Supplier, Account, InitialAccounting, ProductCategory, PurchaseOrder, PurchaseReceipt, PurchaseReturn 
 )
 from .serializers import ProductSerializer
 
@@ -19,19 +19,24 @@ class ProductViewSet(viewsets.ModelViewSet):
 # ================== 自定义后台视图 ==================
 @staff_member_required
 def inventory_status(request):
-    """库存状态页面"""
+    """库存状态页面 - 链接到采购相关表单"""
     products = Product.objects.all().order_by('category__name', 'name')
     
     # 计算库存统计
     total_products = products.count()
-    total_stock = sum(p.stock for p in products)
-    total_value = sum(p.stock * p.cost_price for p in products)
+    total_stock = sum(p.stock or 0 for p in products)
+    total_value = sum((p.stock or 0) * (p.cost_price or 0) for p in products)
     
     # 低库存商品（库存 < 10）
-    low_stock_products = [p for p in products if p.stock < 10]
+    low_stock_products = [p for p in products if p.stock and p.stock < 10]
     
     # 缺货商品（库存 = 0）
     out_of_stock_products = [p for p in products if p.stock == 0]
+    
+    # 采购单据统计
+    purchase_order_count = PurchaseOrder.objects.count()
+    purchase_receipt_count = PurchaseReceipt.objects.count()
+    purchase_return_count = PurchaseReturn.objects.count()
     
     context = {
         'products': products,
@@ -40,9 +45,12 @@ def inventory_status(request):
         'total_value': total_value,
         'low_stock_products': low_stock_products,
         'out_of_stock_products': out_of_stock_products,
+        'purchase_order_count': purchase_order_count,
+        'purchase_receipt_count': purchase_receipt_count,
+        'purchase_return_count': purchase_return_count,
         'title': '库存状态',
     }
-    return render(request, 'inventory/dashboard/stock_status.html', context)
+    return render(request, 'admin/inventory/stock_status.html', context)
 
 
 # ================== 初期建账页面 ==================
@@ -143,90 +151,90 @@ def initial_finance(request):
     return render(request, 'inventory/initial_accounting/finance.html')
 
 
-# ================== 商品分类管理 ==================
+# # ================== 商品分类管理 ==================
 
-@staff_member_required
-def category_list(request, category_id=None):
-    """商品分类列表页面（侧边栏菜单）"""
-    current_category = None
-    categories = None
-    products = None
+# @staff_member_required
+# def category_list(request, category_id=None):
+#     """商品分类列表页面（侧边栏菜单）"""
+#     current_category = None
+#     categories = None
+#     products = None
     
-    if category_id:
-        current_category = get_object_or_404(ProductCategory, id=category_id)
-        # 获取当前分类下的子分类
-        categories = ProductCategory.objects.filter(
-            parent=current_category, 
-            is_active=True
-        ).order_by('sort_order', 'code')
-        # 获取当前分类下的商品
-        products = Product.objects.filter(
-            category=current_category, 
-            is_active=True
-        ).select_related('supplier').order_by('code')
-    else:
-        # 获取顶级分类
-        categories = ProductCategory.objects.filter(
-            parent__isnull=True, 
-            is_active=True
-        ).order_by('sort_order', 'code')
+#     if category_id:
+#         current_category = get_object_or_404(ProductCategory, id=category_id)
+#         # 获取当前分类下的子分类
+#         categories = ProductCategory.objects.filter(
+#             parent=current_category, 
+#             is_active=True
+#         ).order_by('sort_order', 'code')
+#         # 获取当前分类下的商品
+#         products = Product.objects.filter(
+#             category=current_category, 
+#             is_active=True
+#         ).select_related('supplier').order_by('code')
+#     else:
+#         # 获取顶级分类
+#         categories = ProductCategory.objects.filter(
+#             parent__isnull=True, 
+#             is_active=True
+#         ).order_by('sort_order', 'code')
     
-    # 构建面包屑导航
-    breadcrumb = []
-    if current_category:
-        temp = current_category
-        while temp:
-            breadcrumb.insert(0, temp)
-            temp = temp.parent
+#     # 构建面包屑导航
+#     breadcrumb = []
+#     if current_category:
+#         temp = current_category
+#         while temp:
+#             breadcrumb.insert(0, temp)
+#             temp = temp.parent
     
-    context = {
-        'current_category': current_category,
-        'categories': categories,
-        'products': products,
-        'breadcrumb': breadcrumb,
-    }
-    return render(request, 'inventory/product/category_list.html', context)
+#     context = {
+#         'current_category': current_category,
+#         'categories': categories,
+#         'products': products,
+#         'breadcrumb': breadcrumb,
+#     }
+#     return render(request, 'inventory/product/category_list.html', context)
 
 
-@staff_member_required
-def category_add(request, parent_id=None):
-    """添加分类"""
-    parent = None
-    if parent_id:
-        parent = get_object_or_404(ProductCategory, id=parent_id)
+# @staff_member_required
+# def category_add(request, parent_id=None):
+#     """添加分类"""
+#     parent = None
+#     if parent_id:
+#         parent = get_object_or_404(ProductCategory, id=parent_id)
     
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        parent_id = request.POST.get('parent_id')
+#     if request.method == 'POST':
+#         name = request.POST.get('name')
+#         parent_id = request.POST.get('parent_id')
         
-        parent_obj = None
-        if parent_id and parent_id != '0':
-            parent_obj = get_object_or_404(ProductCategory, id=parent_id)
-            # 获取同级分类数量，生成编码
-            siblings = ProductCategory.objects.filter(parent=parent_obj)
-            code_num = siblings.count() + 1
-            code = f"{parent_obj.code}{code_num:04d}"
-            level = parent_obj.level + 1
-        else:
-            # 顶级分类
-            top_level_count = ProductCategory.objects.filter(parent__isnull=True).count()
-            code_num = top_level_count + 1
-            code = f"{code_num:04d}"
-            level = 1
+#         parent_obj = None
+#         if parent_id and parent_id != '0':
+#             parent_obj = get_object_or_404(ProductCategory, id=parent_id)
+#             # 获取同级分类数量，生成编码
+#             siblings = ProductCategory.objects.filter(parent=parent_obj)
+#             code_num = siblings.count() + 1
+#             code = f"{parent_obj.code}{code_num:04d}"
+#             level = parent_obj.level + 1
+#         else:
+#             # 顶级分类
+#             top_level_count = ProductCategory.objects.filter(parent__isnull=True).count()
+#             code_num = top_level_count + 1
+#             code = f"{code_num:04d}"
+#             level = 1
         
-        ProductCategory.objects.create(
-            name=name,
-            code=code,
-            parent=parent_obj,
-            level=level,
-            sort_order=0,
-            is_active=True
-        )
+#         ProductCategory.objects.create(
+#             name=name,
+#             code=code,
+#             parent=parent_obj,
+#             level=level,
+#             sort_order=0,
+#             is_active=True
+#         )
         
-        messages.success(request, f'分类 "{name}" 添加成功')
+#         messages.success(request, f'分类 "{name}" 添加成功')
         
-        if parent_obj:
-            return redirect('admin:category_list', category_id=parent_obj.id)
-        return redirect('admin:category_list')
+#         if parent_obj:
+#             return redirect('admin:category_list', category_id=parent_obj.id)
+#         return redirect('admin:category_list')
     
-    return render(request, 'inventory/product/category_add.html', {'parent': parent})
+#     return render(request, 'inventory/product/category_add.html', {'parent': parent})

@@ -1,0 +1,235 @@
+<!-- templates/admin/product_category_list.html -->
+{% extends "admin/base_site.html" %}
+
+{% block title %}商品管理{% endblock %}
+
+{% block content %}
+<style>
+    .category-container {
+        display: flex;
+        gap: 20px;
+        padding: 20px;
+    }
+    
+    .category-sidebar {
+        width: 280px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .category-sidebar h3 {
+        background: #f8f9fa;
+        padding: 12px 15px;
+        margin: 0;
+        font-size: 14px;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .category-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .category-list li {
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .category-list li a {
+        display: block;
+        padding: 10px 15px;
+        color: #333;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .category-list li a:hover {
+        background: #e9ecef;
+        padding-left: 20px;
+    }
+    
+    .category-list li.active a {
+        background: #3498db;
+        color: white;
+    }
+    
+    .product-area {
+        flex: 1;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 20px;
+    }
+    
+    .breadcrumb {
+        background: #f8f9fa;
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    
+    .breadcrumb a {
+        color: #3498db;
+        text-decoration: none;
+    }
+    
+    .btn-add {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-bottom: 15px;
+        display: inline-block;
+        text-decoration: none;
+    }
+    
+    .product-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .product-table th {
+        background: #f8f9fa;
+        padding: 10px;
+        text-align: left;
+        border-bottom: 2px solid #dee2e6;
+    }
+    
+    .product-table td {
+        padding: 10px;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .empty-box {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+    }
+</style>
+
+<div class="category-container">
+    <!-- 左侧分类导航 -->
+    <div class="category-sidebar">
+        <h3>📁 商品分类111</h3>
+        <ul class="category-list">
+            <li {% if not current_category %}class="active"{% endif %}>
+                <a href="{% url 'admin:category_list' %}">全部商品</a>
+            </li>
+            {% for cat in categories %}
+            <li {% if current_category and current_category.id == cat.id %}class="active"{% endif %}>
+                <a href="{% url 'admin:category_list' cat.id %}">
+                    {{ cat.name }}
+                    <span style="float: right; color: #999; font-size: 12px;">→</span>
+                </a>
+            </li>
+            {% empty %}
+            <li style="padding: 15px; text-align: center; color: #999;">
+                暂无分类，<a href="#" onclick="showAddCategory()">添加分类</a>
+            </li>
+            {% endfor %}
+        </ul>
+        
+        <div style="padding: 15px; border-top: 1px solid #e9ecef;">
+            <button onclick="showAddCategory()" style="width: 100%; background: #3498db; color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer;">
+                + 添加{{ current_category.name|default:"顶级" }}分类
+            </button>
+        </div>
+    </div>
+    
+    <!-- 右侧商品列表 -->
+    <div class="product-area">
+        <!-- 面包屑导航 -->
+        <div class="breadcrumb">
+            <a href="{% url 'admin:category_list' %}">首页</a>
+            {% for cat in breadcrumb %}
+            &nbsp;>&nbsp;
+            <a href="{% url 'admin:category_list' cat.id %}">{{ cat.name }}</a>
+            {% endfor %}
+            {% if current_category %}
+            &nbsp;>&nbsp;
+            <span style="color: #333;">{{ current_category.name }}</span>
+            {% endif %}
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h2 style="margin: 0; font-size: 18px;">
+                {% if current_category %}
+                📦 {{ current_category.name }}
+                {% else %}
+                📦 全部商品
+                {% endif %}
+            </h2>
+            <a href="/admin/inventory/product/add/" class="btn-add">+ 添加商品</a>
+        </div>
+        
+        {% if products %}
+        <table class="product-table">
+            <thead>
+                <tr>
+                    <th>商品编号</th>
+                    <th>商品名称</th>
+                    <th>供应商</th>
+                    <th>单位</th>
+                    <th>库存</th>
+                    <th>成本价</th>
+                    <th>售价</th>
+                    <th>操作</th>
+                </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product.code }}</td>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.supplier.name|default:"-" }}</td>
+                    <td>{{ product.unit }}</td>
+                    <td>{{ product.stock }}</td>
+                    <td>¥{{ product.cost_price }}</td>
+                    <td>¥{{ product.sell_price|default:"-" }}</td>
+                    <td>
+                        <a href="/admin/inventory/product/{{ product.id }}/change/" style="color: #3498db;">编辑</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-box">
+            📭 当前分类下暂无商品，请点击"添加商品"按钮添加
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 添加分类弹窗 -->
+<div id="addCategoryModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; width: 400px; border-radius: 8px; padding: 20px;">
+        <h3>添加{% if current_category %}{{ current_category.name }}{% else %}顶级{% endif %}分类</h3>
+        <form method="post" action="{% url 'admin:category_add' current_category.id|default:0 %}">
+            {% csrf_token %}
+            <input type="hidden" name="parent_id" value="{{ current_category.id|default:'' }}">
+            <div style="margin-bottom: 15px;">
+                <label>分类名称：</label>
+                <input type="text" name="name" style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ced4da; border-radius: 4px;" required>
+            </div>
+            <div style="text-align: right;">
+                <button type="button" onclick="hideAddCategory()" style="background: #6c757d; color: white; border: none; padding: 8px 20px; border-radius: 5px; margin-right: 10px;">取消</button>
+                <button type="submit" style="background: #28a745; color: white; border: none; padding: 8px 20px; border-radius: 5px;">确定</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function showAddCategory() {
+        document.getElementById('addCategoryModal').style.display = 'flex';
+    }
+    
+    function hideAddCategory() {
+        document.getElementById('addCategoryModal').style.display = 'none';
+    }
+</script>
+{% endblock %}

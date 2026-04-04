@@ -9,6 +9,12 @@ from .base import BaseAdmin
 from ..models.core import ColorChoices  # 添加这一行
 from django.urls import path, reverse
 from django.http import JsonResponse
+from .initial import initial_stock_setup
+from django.http import HttpResponseRedirect
+from django.contrib import messages
+
+from django import forms
+from decimal import Decimal
 
 # ================== SKU Inline ==================
 class ProductSKUInline(admin.TabularInline):
@@ -23,13 +29,44 @@ class ProductSKUInline(admin.TabularInline):
     def get_extra(self, request, obj=None, **kwargs):
         return 0
 
+# ================== 商品表单 ==================
+# 创建自定义表单
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = '__all__'
+    
+    def clean_sell_price(self):
+        """确保售价不为空"""
+        sell_price = self.cleaned_data.get('sell_price')
+        if sell_price is None:
+            return Decimal('0.00')
+        return sell_price
+    
+    def clean_cost_price(self):
+        """确保成本价不为空"""
+        cost_price = self.cleaned_data.get('cost_price')
+        if cost_price is None:
+            return Decimal('0.00')
+        return cost_price
+    
+    def clean_stock(self):
+        """确保库存不为空"""
+        stock = self.cleaned_data.get('stock')
+        if stock is None:
+            return 0
+        return stock
 
-# ================== 商品管理 ==================
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     """商品管理"""
     
-    list_display = ['code', 'name', 'brand', 'category', 'sell_price', 'stock', 'is_active']
+    # 使用自定义表单
+    form = ProductForm
+    
+    list_display = ['code', 'name', 'brand', 'category_path', 'sell_price', 'stock_display', 'is_active', 'cost_price', 'stock', 'action_buttons']
+    list_editable = ['cost_price', 'stock']  # 列表页直接编辑
     list_filter = ['category', 'supplier', 'is_active']
     search_fields = ['code', 'name', 'brand']
     list_per_page = 20
@@ -39,8 +76,8 @@ class ProductAdmin(admin.ModelAdmin):
         ('基本信息', {
             'fields': ('code', 'name', 'brand', 'category', 'unit')
         }),
-        ('价格与库存', {
-            'fields': ('cost_price', 'sell_price', 'stock')
+        ('价格信息', {
+            'fields': ('sell_price', 'cost_price', 'stock')  # 添加成本价和库存
         }),
         ('其他信息', {
             'fields': ('supplier', 'account', 'color', 'color_hex', 'is_active', 'remark')
@@ -48,90 +85,228 @@ class ProductAdmin(admin.ModelAdmin):
     )
     
     readonly_fields = ['created_at', 'updated_at']
-    autocomplete_fields = ['category', 'supplier', 'account']
-    save_on_top = True
+    # exclude = ['cost_price', 'stock']
     
+    def action_buttons(self, obj):
+        """操作按钮：编辑和删除"""
+        # 编辑按钮
+        edit_url = reverse('admin:inventory_product_change', args=[obj.id])
+        edit_btn = f'<a href="{edit_url}" class="button edit-btn" style="background: #79aec8; color: white; padding: 4px 10px; text-decoration: none; border-radius: 3px; margin-right: 5px;">✏️ 编辑</a>'
+        
+        # 删除按钮（检查是否可以删除）
+        delete_url = reverse('admin:inventory_product_delete', args=[obj.id])
+        if self.can_delete_object(obj):
+            delete_btn = f'<a href="{delete_url}" class="button delete-btn" style="background: #dc3545; color: white; padding: 4px 10px; text-decoration: none; border-radius: 3px;" onclick="return confirm(\'确定要删除【{obj.name}】吗？\')">🗑️ 删除</a>'
+        else:
+            delete_btn = f'<span style="background: #6c757d; color: white; padding: 4px 10px; border-radius: 3px; cursor: not-allowed;" title="该商品有关联单据，无法删除">🚫 禁用删除</span>'
+        
+        return mark_safe(f'{edit_btn} {delete_btn}')
+    action_buttons.short_description = '操作'
+    action_buttons.allow_tags = True
+    
+    def can_delete_object(self, obj):
+        """检查商品是否可以删除"""
+        # 检查是否有采购单关联
+        if hasattr(obj, 'stockin_set') and obj.stockin_set.exists():
+            return False
+        # 检查是否有销售单关联
+        if hasattr(obj, 'sale_set') and obj.sale_set.exists():
+            return False
+        # 检查是否有维修单关联
+        if hasattr(obj, 'repairitem_set') and obj.repairitem_set.exists():
+            return False
+        # 检查是否有SKU关联
+        if hasattr(obj, 'skus') and obj.skus.exists():
+            return False
+        return True
+    
+    def has_delete_permission(self, request, obj=None):
+        """重写删除权限"""
+        if obj and not self.can_delete_object(obj):
+            return False
+        return super().has_delete_permission(request, obj)
+    
+    def delete_view(self, request, object_id, extra_context=None):
+        """重写删除视图，添加提示"""
+        obj = self.get_object(request, object_id)
+        if obj and not self.can_delete_object(obj):
+            messages.error(request, f'商品【{obj.name}】有关联单据，无法删除！')
+            return HttpResponseRedirect(reverse('admin:inventory_product_changelist'))
+        return super().delete_view(request, object_id, extra_context)
+    
+    def get_form(self, request, obj=None, **kwargs):
+        """设置表单字段的初始值"""
+        form = super().get_form(request, obj, **kwargs)
+        # 为售价设置默认值
+        if 'sell_price' in form.base_fields:
+            form.base_fields['sell_price'].initial = Decimal('0.00')
+            form.base_fields['sell_price'].widget.attrs['step'] = '0.01'
+            form.base_fields['sell_price'].widget.attrs['min'] = '0'
+        return form
+    
+    def save_model(self, request, obj, form, change):
+        """保存时确保数值字段不为空"""
+        if obj.sell_price is None:
+            obj.sell_price = Decimal('0.00')
+        if obj.cost_price is None:
+            obj.cost_price = Decimal('0.00')
+        if obj.stock is None:
+            obj.stock = 0
+        super().save_model(request, obj, form, change)
+    
+    def category_path(self, obj):
+        """获取商品分类的完整路径"""
+        try:
+            if obj and obj.category:
+                names = []
+                cat = obj.category
+                while cat:
+                    names.insert(0, cat.name)
+                    cat = cat.parent
+                return ' / '.join(names)
+        except Exception as e:
+            print(f"category_path error: {e}")
+        return '-'
+    category_path.short_description = '商品分类'
+    
+    def stock_display(self, obj):
+        """库存显示（带预警）"""
+        try:
+            stock = obj.stock if obj.stock is not None else 0
+            if stock <= 0:
+                return f'{stock} (缺货)'
+            elif stock <= 10:
+                return f'{stock} (低库存)'
+            return stock
+        except Exception as e:
+            print(f"stock_display error: {e}")
+            return '0'
+    stock_display.short_description = '库存'
+    
+    def get_urls(self):
+        """添加初期建账URL"""
+        urls = super().get_urls()
+        custom_urls = [
+            path('initial-stock-setup/', self.admin_site.admin_view(initial_stock_setup), 
+                name='product-initial-stock-setup'),
+        ]
+        return custom_urls + urls
     
 # ================== 商品分类管理 ==================
+# inventory/admin/core.py
+from django.contrib import admin
+from django.utils.safestring import mark_safe
+from ..models import ProductCategory
+
+
 @admin.register(ProductCategory)
-class ProductCategoryAdmin(BaseAdmin):
-    """商品分类管理"""
+class ProductCategoryAdmin(admin.ModelAdmin):
+    """商品分类管理 - 标准Admin页面（无树形导航）"""
     
-    # ========== 列表页显示字段 ==========
-    list_display = (
-        'id', 'code', 'name',
-        'brand_display',      # 品牌（自定义显示）
-        'specification_display',  # 规格
-        'model_display',      # 型号
-        'retail_price_display',   # 零售价
-        'remark_display',     # 备注
-        'edit_button'         # 编辑按钮
+    # 列表页显示字段 - 将 'parent' 改为 'parent_display'
+    list_display = ['id', 'code', 'name', 'parent_display', 'level', 'is_active', 'action_buttons']
+    
+    # 列表页筛选器
+    list_filter = ['parent', 'is_active', 'level']
+    
+    # 搜索字段
+    search_fields = ['name', 'code']
+    
+    # 每页显示数量
+    list_per_page = 20
+    
+    # 默认排序
+    ordering = ['level', 'id']
+    
+    # 可编辑字段（列表页直接编辑）
+    list_editable = ['is_active']
+    
+    # 表单页配置
+    fieldsets = (
+        ('分类信息', {
+            'fields': ('name', 'code', 'parent', 'level', 'is_active')
+        }),
+        ('商品信息（默认值）', {
+            'fields': ('brand', 'specification', 'model', 'retail_price', 'remark'),
+            'classes': ('collapse',),
+            'description': '这些信息将作为该分类下新商品的默认值'
+        }),
     )
     
-    list_display_links = None                           # 禁用默认的链接
-    # list_filter = ('parent', 'is_active', 'level')    # 右侧筛选器
-    search_fields = ['name', 'code', 'brand', 'model']  # 可搜索字段
-    list_editable = ()            # 不可直接编辑
-    list_per_page = 25            # 每页显示25条
-    ordering = ['level', 'id']    # 按层级和ID排序
+    # 只读字段
+    readonly_fields = ['code', 'level']
     
-    # ========== 列表页只读显示方法 ==========
-    def brand_display(self, obj):
-        return obj.brand if obj.brand else '-'
-    brand_display.short_description = '品牌'
-    
-    def specification_display(self, obj):
-        return obj.specification if obj.specification else '-'
-    specification_display.short_description = '规格'
-    
-    def model_display(self, obj):
-        return obj.model if obj.model else '-'
-    model_display.short_description = '型号'
-    
-    def retail_price_display(self, obj):
-        if obj.retail_price:
-            return f"¥{obj.retail_price}"
+    def parent_display(self, obj):
+        """显示父级分类的完整路径"""
+        if obj.parent:
+            if hasattr(obj.parent, 'get_full_path'):
+                return obj.parent.get_full_path()
+            # 手动构建路径
+            path_parts = []
+            cat = obj.parent
+            while cat:
+                path_parts.insert(0, cat.name)
+                cat = cat.parent
+            return ' / '.join(path_parts)
         return '-'
-    retail_price_display.short_description = '零售价'
+    parent_display.short_description = '父级分类'
+    parent_display.admin_order_field = 'parent__name'
     
-    def remark_display(self, obj):
-        if obj.remark:
-            return obj.remark[:10] + ('...' if len(obj.remark) > 10 else '')
-        return '-'
-    remark_display.short_description = '商品备注'
     
-    # ========== 编辑按钮 ==========
-    def edit_button(self, obj):
-        """编辑按钮"""
-        from django.urls import reverse
-        return mark_safe(
-            '<a href="{}" class="edit-link" style="display: inline-block; background: #79aec8; color: white; padding: 4px 10px; text-decoration: none; border-radius: 3px; font-size: 12px;">'
-            '✏️ 编辑'
-            '</a>'.format(
-                reverse('admin:inventory_productcategory_change', args=[obj.id])
-            )
-        )
-    edit_button.short_description = '操作'
-    
-    # ========== 查询集处理 ==========
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        parent_id = request.GET.get('parent')
-        if parent_id:
-            qs = qs.filter(parent_id=parent_id)
+    def action_buttons(self, obj):
+        """操作按钮：编辑和删除"""
+        # 编辑按钮
+        edit_url = reverse('admin:inventory_productcategory_change', args=[obj.id])
+        edit_btn = f'<a href="{edit_url}" class="button edit-btn" style="background: #79aec8; color: white; padding: 4px 10px; text-decoration: none; border-radius: 3px; margin-right: 5px;">✏️ 编辑</a>'
+        
+        # 删除按钮（检查是否可以删除）
+        delete_url = reverse('admin:inventory_productcategory_delete', args=[obj.id])
+        if self.can_delete_object(obj):
+            delete_btn = f'<a href="{delete_url}" class="button delete-btn" style="background: #dc3545; color: white; padding: 4px 10px; text-decoration: none; border-radius: 3px;" onclick="return confirm(\'确定要删除【{obj.name}】及其所有子分类吗？\')">🗑️ 删除</a>'
         else:
-            qs = qs.filter(parent__isnull=True)
-        return qs
+            delete_btn = f'<span style="background: #6c757d; color: white; padding: 4px 10px; border-radius: 3px; cursor: not-allowed;" title="该分类下有商品，无法删除">🚫 禁用删除</span>'
+        
+        return mark_safe(f'{edit_btn} {delete_btn}')
+    action_buttons.short_description = '操作'
     
-    # ========== 保存处理 ==========
+    def can_delete_object(self, obj):
+        """检查分类是否可以删除"""
+        # 检查是否有子分类
+        if obj.children.exists():
+            return False
+        # 检查分类下是否有商品
+        if hasattr(obj, 'products') and obj.products.exists():
+            return False
+        return True
+    
+    def has_delete_permission(self, request, obj=None):
+        """重写删除权限"""
+        if obj and not self.can_delete_object(obj):
+            return False
+        return super().has_delete_permission(request, obj)
+    
+    def delete_view(self, request, object_id, extra_context=None):
+        """重写删除视图，添加提示"""
+        obj = self.get_object(request, object_id)
+        if obj:
+            if obj.children.exists():
+                messages.error(request, f'分类【{obj.name}】下有子分类，请先删除子分类！')
+                return HttpResponseRedirect(reverse('admin:inventory_productcategory_changelist'))
+            if hasattr(obj, 'products') and obj.products.exists():
+                messages.error(request, f'分类【{obj.name}】下有商品，无法删除！')
+                return HttpResponseRedirect(reverse('admin:inventory_productcategory_changelist'))
+        return super().delete_view(request, object_id, extra_context)
+    
+    # 保存时自动处理
     def save_model(self, request, obj, form, change):
-        if not change:
+        """保存时自动处理层级和编码"""
+        if not change:  # 新增
             if obj.parent:
                 obj.level = obj.parent.level + 1
             else:
                 obj.level = 1
         
-        if not obj.code:
+        if not obj.code:  # 自动生成编码
             if obj.parent:
                 siblings = ProductCategory.objects.filter(parent=obj.parent).exclude(id=obj.id)
                 max_code = siblings.order_by('-code').first()
@@ -148,248 +323,9 @@ class ProductCategoryAdmin(BaseAdmin):
                     obj.code = f"{(last_num + 1):04d}"
                 else:
                     obj.code = "0001"
-
+        
         super().save_model(request, obj, form, change)
-    
-    # ========== 表单页配置 ==========
-    fieldsets = (
-        ('分类信息', {
-            #name(名称)、parent(父级分类)、is_active(是否启用)
-            'fields': ('name', 'parent', 'is_active'), 
-        }),
-        ('商品信息', {
-                        # 品牌、      规格、        型号、      零售价、       备注
-            'fields': ('brand', 'specification', 'model', 'retail_price', 'remark'),
-            'classes': ('collapse',),   # 这个分组默认折叠，点击才展开（适用于非核心信息）
-            'description': '这些信息将作为该分类下新商品的默认值'
-        }),
-    )
-    '''
-    这些字段在编辑页面只能看不能改，通常用于：
-        code：系统自动生成的编码
-        level：自动计算的层级
-        created_at：创建时间戳（不可修改）
-    '''
-    readonly_fields = ['code', 'level', 'created_at']
-    
-    # ========== 树形结构构建方法 ==========
-    def _build_tree_html(self, categories, parent_id=None, level=0, expand_ids=None):
-        """构建可折叠的树形结构HTML"""
-        if expand_ids is None:
-            expand_ids = []
         
-        html = ''
-        siblings = [cat for cat in categories if cat.parent_id == parent_id]
-        
-        for i, cat in enumerate(siblings):
-            is_last = (i == len(siblings) - 1)
-            children = categories.filter(parent_id=cat.id)
-            has_children = children.exists()
-            
-            # 构建前缀
-            prefix = ''
-            if level > 0:
-                prefix = ' ' * (level - 1)
-                if is_last:
-                    prefix += '└'
-                else:
-                    prefix += '├'
-            
-            # 判断是否默认展开
-            is_expanded = cat.id in expand_ids
-            display_style = 'block' if is_expanded else 'none'
-            toggle_icon = '▼' if is_expanded else '▶'
-            
-            # 高亮当前选中的分类
-            current_parent = self.request.GET.get('parent')
-            is_active = str(cat.id) == current_parent
-            
-            # 文件夹图标
-            folder_icon = '📁' if has_children else '📄'
-            
-            html += f'''
-            <div class="tree-node" style="margin: 2px 0;">
-                <div class="tree-item" style="white-space: nowrap; 
-                    background: {is_active and '#e9ecef' or 'transparent'};
-                    font-weight: {is_active and 'bold' or 'normal'};">
-                    <span class="tree-prefix" style="color: #6c757d;">{prefix}</span>
-                    <span class="tree-folder-icon">{folder_icon}</span>
-                    <a href="?parent={cat.id}" data-id="{cat.id}" 
-                    data-has-children="{str(has_children).lower()}"
-                    class="tree-link {'has-children' if has_children else 'no-children'}"
-                    style="text-decoration: none; color: {is_active and '#0d6efd' or '#2c3e50'};">
-                        {cat.name}
-                    </a>
-                    {f'<span class="tree-toggle" data-id="{cat.id}" style="cursor: pointer; margin-left: 5px; color: #6c757d;">{toggle_icon}</span>' if has_children else ''}
-                </div>
-                <div class="tree-children" id="children_{cat.id}" style="display: {display_style}; margin-left: 20px;">
-                    {self._build_tree_html(categories, cat.id, level + 1, expand_ids) if has_children else ''}
-                </div>
-            </div>
-            '''
-        
-        return html
-    
-    def _get_category_path(self, category):
-        """获取分类的完整路径"""
-        path = []
-        current = category
-        while current:
-            path.insert(0, current.name)
-            current = current.parent
-        return ' > '.join(path)
-    
-    # ========== 主视图 ==========
-    def changelist_view(self, request, extra_context=None):
-        """列表页视图 - 添加树形导航"""
-        
-        extra_context = extra_context or {}
-        self.request = request
-        
-        # 获取需要展开的所有父级ID
-        def _get_expand_ids(category):
-            ids = []
-            current = category
-            while current:
-                ids.append(current.id)
-                current = current.parent
-            return ids
-        
-        # 获取所有分类
-        all_categories = ProductCategory.objects.filter(is_active=True).order_by('level', 'id')
-        
-        # 获取当前选中分类的完整路径
-        parent_id = request.GET.get('parent')
-        current_path = ''
-        expand_ids = []
-        
-        if parent_id:
-            try:
-                current = ProductCategory.objects.get(id=parent_id)
-                current_path = self._get_category_path(current)
-                expand_ids = _get_expand_ids(current)
-            except ProductCategory.DoesNotExist:
-                pass
-        
-        # 构建树形结构（传入 expand_ids）
-        category_tree = self._build_tree_html(all_categories, expand_ids=expand_ids)
-        
-        # 传递给模板
-        extra_context['expand_ids'] = expand_ids
-        extra_context['category_tree'] = mark_safe(category_tree)
-        extra_context['current_path'] = current_path
-        extra_context['custom_js'] = self._get_custom_js()
-        
-        return super().changelist_view(request, extra_context=extra_context)
-    
-    # ========== JavaScript ==========
-    def _get_custom_js(self):
-        return '''
-        <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // 加载保存的展开状态
-            function loadExpandedState() {
-                const expanded = localStorage.getItem('category_tree_expanded');
-                if (expanded) {
-                    const expandedIds = JSON.parse(expanded);
-                    expandedIds.forEach(id => {
-                        const childrenDiv = document.getElementById('children_' + id);
-                        const toggleSpan = document.querySelector(`.tree-toggle[data-id="${id}"]`);
-                        if (childrenDiv && toggleSpan) {
-                            childrenDiv.style.display = 'block';
-                            toggleSpan.textContent = '▼';
-                        }
-                    });
-                }
-            }
-            
-            document.querySelectorAll('.tree-link').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    const hasChildren = this.getAttribute('data-has-children') === 'true';
-                    
-                    if (!hasChildren) {
-                        e.preventDefault();  // 🚫 阻止跳转
-                    }
-                });
-            });
-
-            // 保存展开状态
-            function saveExpandedState() {
-                const expandedIds = [];
-                document.querySelectorAll('.tree-children').forEach(children => {
-                    if (children.style.display === 'block') {
-                        const id = children.id.replace('children_', '');
-                        expandedIds.push(id);
-                    }
-                });
-                localStorage.setItem('category_tree_expanded', JSON.stringify(expandedIds));
-            }
-            
-            // 绑定折叠/展开事件
-            document.querySelectorAll('.tree-toggle').forEach(toggle => {
-                toggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    const categoryId = this.getAttribute('data-id');
-                    const childrenDiv = document.getElementById('children_' + categoryId);
-                    
-                    if (childrenDiv) {
-                        if (childrenDiv.style.display === 'none' || !childrenDiv.style.display) {
-                            childrenDiv.style.display = 'block';
-                            this.textContent = '▼';
-                        } else {
-                            childrenDiv.style.display = 'none';
-                            this.textContent = '▶';
-                        }
-                    }
-                });
-            });
-
-            document.querySelectorAll('.tree-item a').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    // 不阻止跳转
-                });
-            });
-
-            // 为右侧列表添加双击事件
-            const rows = document.querySelectorAll('#result_list tbody tr');
-            rows.forEach(row => {
-                row.style.cursor = 'pointer';
-                row.addEventListener('dblclick', function(e) {
-                    if (e.target.tagName === 'A' || e.target.closest('.edit-link')) {
-                        return;
-                    }
-                    
-                    const firstCell = this.querySelector('td:first-child');
-                    if (!firstCell) return;
-                    
-                    let categoryId = firstCell.textContent.trim();
-                    const idInput = this.querySelector('input[name="_selected_action"]');
-                    if (idInput) {
-                        categoryId = idInput.value;
-                    }
-                    
-                    if (categoryId) {
-                        const hasChildren = this.querySelector('.button') !== null;
-                        if (hasChildren) {
-                            window.location.href = '?parent=' + categoryId;
-                        } else {
-                            window.location.href = '/admin/inventory/product/add/?category=' + categoryId;
-                        }
-                    }
-                });
-            });
-            
-            // 自动滚动到当前选中的分类
-            const activeLink = document.querySelector('.tree-item a[style*="font-weight: bold"]');
-            if (activeLink) {
-                activeLink.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        });
-        </script>
-        '''
-     
 # ================== SKU 属性管理 ==================
 @admin.register(ProductAttribute)
 class ProductAttributeAdmin(admin.ModelAdmin):

@@ -5,8 +5,8 @@ from rest_framework.routers import DefaultRouter
 from inventory import views
 from django.conf import settings
 from django.conf.urls.static import static
-
-
+from inventory.admin.initial import initial_stock_setup
+from inventory.views import inventory_status
 router = DefaultRouter()
 router.register(r'products', views.ProductViewSet)
 
@@ -18,17 +18,19 @@ urlpatterns = [
     path('admin/initial-cash/', views.initial_cash, name='initial_cash'),
     path('admin/initial-finance/', views.initial_finance, name='initial_finance'),
 
-    # ================= 商品分类 =================
-    path('admin/product-category/', views.category_list, name='category_list'),
-    path('admin/product-category/<int:category_id>/', views.category_list, name='category_list'),
-    path('admin/category-add/', views.category_add, name='category_add'),
-    path('admin/category-add/<int:parent_id>/', views.category_add, name='category_add'),
+    # # ================= 商品分类 =================
+    # path('admin/product-category/', views.category_list, name='category_list'),
+    # path('admin/product-category/<int:category_id>/', views.category_list, name='category_list'),
+    # path('admin/category-add/', views.category_add, name='category_add'),
+    # path('admin/category-add/<int:parent_id>/', views.category_add, name='category_add'),
 
     # ================= 库存 =================
     path('admin/inventory/status/', views.inventory_status, name='inventory_status'),
 
     # ================= 后台 =================
     path('admin/', admin.site.urls),
+    path('admin/initial-stock-setup/', initial_stock_setup, name='initial-stock-setup'),
+    path('admin/inventory/status/', inventory_status, name='inventory_status'),
 
     # ================= API =================
     path('api/', include(router.urls)),
