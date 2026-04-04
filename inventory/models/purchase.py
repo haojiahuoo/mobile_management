@@ -85,6 +85,7 @@ class PurchaseReceipt(models.Model):
     remark = models.TextField(null=True, blank=True, verbose_name="备注")
     created_by = models.CharField(max_length=100, null=True, blank=True, verbose_name="入库人")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+    is_stock_updated = models.BooleanField(default=False, verbose_name="库存是否已更新")
     
     class Meta:
         db_table = 'inventory_purchase_receipt'
@@ -171,28 +172,47 @@ class PurchaseReceiptItem(models.Model):
         return f"{self.receipt.receipt_no} - {self.product.name}"
 
 
+# inventory/models/purchase.py
+
 class PurchaseReturn(models.Model):
     """采购退货单"""
     return_no = models.CharField(max_length=50, unique=True, verbose_name="退货单号")
-    purchase_order = models.ForeignKey(PurchaseOrder, on_delete=models.CASCADE, verbose_name="采购订单")
+    purchase_order = models.ForeignKey(
+        'PurchaseOrder', 
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        verbose_name="采购订单"
+    )
+    purchase_receipt = models.ForeignKey(
+        'PurchaseReceipt',
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        verbose_name="入库单号"
+    )
     return_date = models.DateField(auto_now_add=True, verbose_name="退货日期")
     total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="退货总额")
-    reason = models.TextField(verbose_name="退货原因")
+    reason = models.TextField(null=True, blank=True, verbose_name="退货原因")
     remark = models.TextField(null=True, blank=True, verbose_name="备注")
     created_by = models.CharField(max_length=100, null=True, blank=True, verbose_name="退货人")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+    _stock_updated = models.BooleanField(default=False, editable=False)  # 添加这个字段
     
     class Meta:
         db_table = 'inventory_purchase_return'
         verbose_name = "采购退货单"
         verbose_name_plural = "采购退货单列表"
+        ordering = ['-return_date']
+    
+    # ... 其他方法 ...
     
     def __str__(self):
-        return f"{self.return_no} - {self.purchase_order.supplier.name}"
+        if self.purchase_order:
+            return f"{self.return_no} - {self.purchase_order.supplier.name}"
+        return f"{self.return_no} - 无关联订单"
     
     def update_total_amount(self):
         """更新退货单总额"""
-        total = self.items.aggregate(total=Sum('subtotal'))['total'] or 0
+        total = self.items.aggregate(total=models.Sum('subtotal'))['total'] or 0
         self.total_amount = total
         self.save(update_fields=['total_amount'])
     
@@ -202,25 +222,18 @@ class PurchaseReturn(models.Model):
         
         for item in self.items.all():
             product = item.product
-            if not product:
-                continue
             
-            # 获取库存记录
             try:
                 stock = Stock.objects.get(product=product)
             except Stock.DoesNotExist:
                 continue
             
-            # 记录退货前的数量
             before_quantity = stock.quantity
-            
-            # 扣减库存
             stock.quantity -= item.quantity
             if stock.quantity < 0:
                 stock.quantity = 0
             stock.save()
             
-            # 记录库存流水
             StockRecord.objects.create(
                 product=product,
                 record_type='return',
@@ -232,7 +245,6 @@ class PurchaseReturn(models.Model):
                 created_by=self.created_by
             )
             
-            # 更新商品主表中的库存
             product.stock = stock.quantity
             product.save(update_fields=['stock'])
 
@@ -254,7 +266,10 @@ class PurchaseReturnItem(models.Model):
     def save(self, *args, **kwargs):
         self.subtotal = self.quantity * self.unit_price
         super().save(*args, **kwargs)
-        self.return_order.update_total_amount()
+        if self.return_order:
+            self.return_order.update_total_amount()
     
     def __str__(self):
         return f"{self.return_order.return_no} - {self.product.name}"
+
+

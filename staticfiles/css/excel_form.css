@@ -1,0 +1,226 @@
+/* static/admin/css/excel_style.css - 表单页改成表格风格 */
+
+/* ==================== 表单页面改为表格风格（与列表页完全一致） ==================== */
+
+/* 表单容器 */
+#content {
+    background: #f5f5f5;
+    padding: 20px;
+}
+
+/* 表单主体 - 表格容器 */
+.module {
+    background: white;
+    border: 1px solid #e0e0e0;
+    overflow-x: auto;
+}
+
+/* 字段集 - 作为表格区域 */
+.fieldset {
+    margin-bottom: 0;
+}
+
+/* 字段集标题 - 类似表格标题行 */
+.fieldset h2 {
+    background: #f5f5f5;
+    padding: 10px 12px;
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 2px solid #e0e0e0;
+    font-family: 'Segoe UI', '微软雅黑', '宋体', Arial, sans-serif;
+    text-align: center;
+}
+
+/* 表单行 - 表格行 */
+.form-row {
+    display: table-row;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.form-row:hover {
+    background: #f9f9f9;
+}
+
+/* 表单字段 - 表格单元格 */
+.form-row > div {
+    display: table-cell;
+    padding: 8px 12px;
+    vertical-align: middle;
+    border-right: 1px solid #e8e8e8;
+    text-align: left;
+}
+
+.form-row > div:last-child {
+    border-right: none;
+}
+
+/* 标签样式 - 表头样式 */
+.aligned label {
+    font-weight: 600;
+    color: #333;
+    font-size: 12px;
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+    width: auto;
+    font-family: 'Segoe UI', '微软雅黑', '宋体', Arial, sans-serif;
+}
+
+/* 输入框样式 - 单元格内输入 */
+.aligned input[type="text"],
+.aligned input[type="number"],
+.aligned input[type="date"],
+.aligned select,
+.aligned textarea {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #d0d0d0;
+    border-radius: 2px;
+    font-size: 12px;
+    font-family: 'Segoe UI', '微软雅黑', '宋体', Arial, sans-serif;
+    box-sizing: border-box;
+    background: white;
+}
+
+.aligned input:focus,
+.aligned select:focus,
+.aligned textarea:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+/* 复选框样式 */
+.aligned input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+}
+
+/* 只读字段 */
+.readonly {
+    display: inline-block;
+    padding: 6px 0;
+    color: #666;
+    font-size: 12px;
+    background: transparent;
+    width: 100%;
+}
+
+/* 帮助文本 - 单元格内小字 */
+.help {
+    font-size: 11px;
+    color: #999;
+    margin-top: 4px;
+    margin-bottom: 0;
+}
+
+/* 错误信息 - 表格上方 */
+.errornote {
+    background: #ffebee;
+    color: #c62828;
+    border-left: 4px solid #dc3545;
+    padding: 8px 15px;
+    margin-bottom: 20px;
+    font-size: 12px;
+    font-family: 'Segoe UI', '微软雅黑', '宋体', Arial, sans-serif;
+}
+
+/* 错误字段列表 - 单元格内红色提示 */
+.errorlist {
+    color: #dc3545;
+    font-size: 11px;
+    margin: 4px 0 0 0;
+    list-style: none;
+    padding: 0;
+}
+
+/* 按钮区域 - 表格底部 */
+.submit-row {
+    background: #fafafa;
+    padding: 12px 20px;
+    border-top: 1px solid #e0e0e0;
+    text-align: right;
+}
+
+.submit-row input {
+    padding: 6px 20px;
+    font-size: 12px;
+    border-radius: 2px;
+    cursor: pointer;
+    background: #f0f0f0;
+    border: 1px solid #d0d0d0;
+    margin-left: 8px;
+    font-family: 'Segoe UI', '微软雅黑', '宋体', Arial, sans-serif;
+}
+
+.submit-row input.default {
+    background: #3498db;
+    border-color: #3498db;
+    color: white;
+}
+
+.submit-row input.default:hover {
+    background: #2980b9;
+}
+
+.submit-row input:hover {
+    background: #e0e0e0;
+}
+
+/* 删除按钮 */
+.deletelink {
+    background: #dc3545 !important;
+    color: white !important;
+    border-color: #dc3545 !important;
+}
+
+.deletelink:hover {
+    background: #c82333 !important;
+}
+
+/* 颜色预览块 */
+.color-preview {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 2px;
+    border: 1px solid #ddd;
+    vertical-align: middle;
+}
+
+/* 分组描述 - 类似表格注释行 */
+.fieldset .description {
+    background: #fff3e0;
+    border-left: 3px solid #ed6c02;
+    padding: 8px 12px;
+    margin: 0;
+    font-size: 11px;
+    color: #856404;
+    font-family: 'Segoe UI', '微软雅黑', '宋体', Arial, sans-serif;
+}
+
+/* 响应式 - 小屏幕时改为块级布局 */
+@media (max-width: 768px) {
+    .form-row {
+        display: block;
+        padding: 12px;
+    }
+    
+    .form-row > div {
+        display: block;
+        padding: 5px 0;
+        border-right: none;
+    }
+    
+    .aligned input,
+    .aligned select,
+    .aligned textarea {
+        width: 100%;
+    }
+    
+    .help {
+        margin-left: 0;
+    }
+}

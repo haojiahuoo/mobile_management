@@ -14,6 +14,12 @@ from .purchase import (
 )
 from .stock import StockAdmin, StockRecordAdmin, StockCheckAdmin, StockTransferAdmin
 
+from .sale import (
+    SaleOrderAdmin, SaleOrderItemInline,
+    SaleDeliveryAdmin, SaleDeliveryItemInline,
+    SaleReturnAdmin, SaleReturnItemInline
+)
+
 __all__ = [
     'BaseAdmin', 'fmt_money', 'fmt_status', 'fmt_stock',
     'ProductAdmin', 'ProductCategoryAdmin', 'ProductSKUInline',

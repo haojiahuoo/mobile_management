@@ -156,7 +156,7 @@ LOGGING = {
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # 添加这行，collectstatic 时的目标目录
 STATICFILES_DIRS = [
     BASE_DIR / 'inventory' / 'static',
 ]

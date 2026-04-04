@@ -1,0 +1,346 @@
+/* static/admin/css/excel_style.css */
+
+/* ==================== Excel风格表格样式 ==================== */
+
+/* 整体容器 */
+#changelist-form {
+    background: white;
+    border-radius: 0;
+    overflow-x: auto;
+    box-shadow: none;
+}
+
+/* 表格容器 */
+.results {
+    overflow-x: auto;
+}
+
+/* Excel风格表格 */
+.results table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Segoe UI', '微软雅黑', '宋体', Arial, sans-serif;
+    font-size: 12px;
+    border: 1px solid #e0e0e0;
+}
+
+/* 表头样式 - Excel风格 */
+.results table thead tr {
+    background: #f5f5f5;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.results table thead th {
+    padding: 10px 12px;
+    text-align: center;
+    font-weight: 600;
+    color: #333;
+    font-size: 12px;
+    border-right: 1px solid #e0e0e0;
+    border-bottom: 2px solid #e0e0e0;
+    background: #f8f9fa;
+    letter-spacing: 0.5px;
+}
+
+.results table thead th:last-child {
+    border-right: none;
+}
+
+/* 表格行样式 */
+.results table tbody tr {
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.results table tbody tr:hover {
+    background: #f9f9f9;
+}
+
+/* 单元格样式 */
+.results table td {
+    padding: 8px 12px;
+    text-align: center;
+    vertical-align: middle;
+    border-right: 1px solid #e8e8e8;
+    font-size: 12px;
+    color: #555;
+}
+
+.results table td:last-child {
+    border-right: none;
+}
+
+/* 左对齐的列（编号、名称等） */
+.results table td:first-child,
+.results table td:nth-child(2),
+.results table td:nth-child(3),
+.results table td:nth-child(4) {
+    text-align: left;
+}
+
+/* 可编辑字段输入框样式 */
+.results table td input {
+    width: 80px;
+    padding: 4px 6px;
+    text-align: center;
+    border: 1px solid #d0d0d0;
+    border-radius: 2px;
+    font-size: 12px;
+    font-family: inherit;
+}
+
+.results table td input:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.results table td select {
+    width: 100px;
+    padding: 4px 6px;
+    border: 1px solid #d0d0d0;
+    border-radius: 2px;
+    font-size: 12px;
+}
+
+/* 状态徽章 */
+.status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.status-active {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.status-inactive {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+/* 价格和金额样式 */
+.price-value {
+    font-weight: 500;
+    color: #2e7d32;
+}
+
+.profit-value {
+    font-weight: 500;
+    color: #1976d2;
+}
+
+.cost-value {
+    font-weight: 500;
+    color: #ed6c02;
+}
+
+/* 库存预警 */
+.stock-low {
+    color: #ed6c02;
+    font-weight: 500;
+}
+
+.stock-out {
+    color: #d32f2f;
+    font-weight: 600;
+}
+
+.stock-normal {
+    color: #2e7d32;
+}
+
+/* 操作按钮 */
+.action-buttons {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+
+.action-buttons a {
+    padding: 3px 8px;
+    border-radius: 3px;
+    text-decoration: none;
+    font-size: 11px;
+    transition: all 0.2s;
+}
+
+.action-edit {
+    background: #f0f0f0;
+    color: #666;
+    border: 1px solid #ddd;
+}
+
+.action-edit:hover {
+    background: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+
+.action-delete {
+    background: #f0f0f0;
+    color: #666;
+    border: 1px solid #ddd;
+}
+
+.action-delete:hover {
+    background: #e74c3c;
+    color: white;
+    border-color: #e74c3c;
+}
+
+/* 筛选栏样式 */
+#changelist-filter {
+    background: #fafafa;
+    border: 1px solid #e8e8e8;
+    border-radius: 4px;
+    padding: 12px;
+}
+
+#changelist-filter h3 {
+    background: none;
+    color: #333;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 0;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+#changelist-filter a {
+    color: #666;
+    font-size: 12px;
+}
+
+#changelist-filter a:hover {
+    color: #3498db;
+}
+
+/* 搜索框样式 */
+.search-container {
+    margin-bottom: 15px;
+}
+
+#searchbar {
+    width: 280px;
+    padding: 6px 12px;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+/* 分页样式 */
+.paginator {
+    padding: 12px;
+    background: #fafafa;
+    border-top: 1px solid #e8e8e8;
+    font-size: 12px;
+    color: #666;
+}
+
+.paginator a {
+    color: #3498db;
+    text-decoration: none;
+    padding: 4px 8px;
+    margin: 0 2px;
+    border-radius: 3px;
+}
+
+.paginator a:hover {
+    background: #e8f0fe;
+}
+
+.paginator .this-page {
+    background: #3498db;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 3px;
+}
+
+/* 操作按钮区域 */
+.submit-row {
+    padding: 12px;
+    background: #fafafa;
+    border-top: 1px solid #e8e8e8;
+    margin-top: 15px;
+}
+
+.submit-row input {
+    padding: 6px 16px;
+    font-size: 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    background: #f0f0f0;
+    border: 1px solid #d0d0d0;
+}
+
+.submit-row input.default {
+    background: #3498db;
+    border-color: #3498db;
+    color: white;
+}
+
+/* 响应式滚动 */
+@media (max-width: 1200px) {
+    .results {
+        overflow-x: auto;
+    }
+    .results table {
+        min-width: 800px;
+    }
+}
+
+/* 颜色显示块 */
+.color-block {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+/* static/admin/css/excel_style.css */
+
+/* 库存预警样式 */
+.stock-normal {
+    color: #2e7d32;
+    font-weight: 500;
+}
+
+.stock-low {
+    color: #ed6c02;
+    font-weight: 500;
+}
+
+.stock-out {
+    color: #d32f2f;
+    font-weight: 600;
+    background: #ffebee;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* 价格样式 */
+.price-value {
+    font-weight: 500;
+    color: #2e7d32;
+}
+
+/* 只读字段样式 */
+.readonly {
+    background: #f5f5f5;
+    color: #666;
+}
+
+/* 提示信息样式 */
+.field-description {
+    background: #fff3e0;
+    border-left: 3px solid #ed6c02;
+    padding: 8px 12px;
+    margin-bottom: 15px;
+    font-size: 12px;
+    color: #666;
+}

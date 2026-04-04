@@ -8,7 +8,7 @@ class Supplier(models.Model):
     SUPPLIER_TYPE = (('supplier', '供应商'), ('customer', '客户'), ('both', '既是供应商也是客户'))
 
     name = models.CharField(max_length=100, verbose_name="单位名称")
-    type = models.CharField(max_length=20, choices=SUPPLIER_TYPE, default='customer', verbose_name="单位类型")
+    type = models.CharField(max_length=20, choices=SUPPLIER_TYPE, default='supplier', verbose_name="单位类型")
     contact_person = models.CharField(max_length=50, null=True, blank=True, verbose_name="联系人")
     phone = models.CharField(max_length=20, null=True, blank=True, verbose_name="联系电话")
     address = models.TextField(null=True, blank=True, verbose_name="地址")
